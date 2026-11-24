@@ -1,8 +1,35 @@
 # FF Resonance companion: plan
 
-A second-screen companion for **Final Fantasy Resonance** (Switch 1 version) running in
-[Eden Duo](https://github.com/igawa6/eden-duo), built the same way as the packages in
+A second-screen companion for **Final Fantasy Resonance** (Switch 1 version, title ID
+`0100606026F12000`) that runs in both:
+
+- [Peanuts Native](https://github.com/igawa6/peanuts-native): rewrites the game to run natively on
+  Android. Lists FF Resonance as supported (update 1.0.1) with no companion yet.
+- [Eden Duo](https://github.com/igawa6/eden-duo): the emulator. Same package format, and it's where
+  the dev and reverse-engineering tools live.
+
+Built the same way as the packages in
 [eden-duo-companions](https://github.com/igawa6/eden-duo-companions).
+
+## Peanuts Native compatibility rules
+
+Peanuts Native embeds the Eden Duo companion runtime, so one package can serve both. From its
+dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
+
+- **Runtime 24 max.** It carries Eden Duo 1.3.5.1's runtime (24). Keep `min_runtime` at 24 or
+  below, so no runtime-25 features (`@screen.*`, `canvas_alt`, `L3`/`R3` buttons) unless it
+  updates. Re-check before release.
+- **Native modules work** (`modules/android-arm64-v8a/<title>.so`).
+- **No guest calls** (calling the game's own functions). Treat it like Android NCE: use memory
+  reads, guarded writes or button presses only.
+- **Load plans / guest helper code: unconfirmed.** DQ3 and Octopath 0 rely on them. Avoid
+  depending on one until we've verified it works in Peanuts.
+- **Build ID.** Target the 1.0.1 update build, the one Peanuts supports. Peanuts passes the full
+  build ID to modules (`PN_BUILD_ID`).
+- **Unreal Engine confirmed.** Peanuts decodes FF Resonance's Unreal assets, which matches the
+  HD-2D templates.
+- **Final testing happens on the handheld in Peanuts**, not just in Eden Duo. Peanuts needs
+  Android 13+, a Snapdragon GPU with Vulkan 1.3, and 12 GB RAM (developed on the AYN Thor).
 
 ## How a companion works (short version)
 
@@ -32,7 +59,8 @@ A second-screen companion for **Final Fantasy Resonance** (Switch 1 version) run
 - [ ] A Linux machine for the desktop dev build (native Linux, or WSL2 on Windows; to confirm).
 - [ ] A dual-screen Android handheld for final testing (or a phone/tablet, since Eden Duo 1.4.0
       supports single-screen shared mode).
-- [ ] Confirm the game boots and is playable in Eden Duo. If it doesn't, stop here.
+- [ ] Build and play FF Resonance in Peanuts Native on your handheld.
+- [ ] Confirm the game also boots in Eden Duo on the desktop (needed for the dev tools).
 
 ### Phase 1: Dev environment
 - [ ] Build `eden-cli` (Linux, dev tools on) from eden-duo.
@@ -62,13 +90,14 @@ A second-screen companion for **Final Fantasy Resonance** (Switch 1 version) run
 ### Phase 5: Validate
 - [ ] Every value matches the game's own menu (sentinel test: change a value in RAM, both
       screens follow, then restore).
-- [ ] Test on device (Android runs NCE, which behaves differently from desktop).
+- [ ] Test on device in **Peanuts Native** (install via Settings > Screens > Dual-screen
+      companions > Install from file), and in Eden Duo on Android.
 
 ### Phase 6: Share
 - [ ] Open a PR/issue on eden-duo-companions with title ID, game version, Eden Duo version
       and screenshots of both screens.
 
 ## Open questions
-- Exact title ID and current update version.
-- Does it boot in Eden Duo today?
+- Does it boot in Eden Duo on desktop? If not, the reverse-engineering tools are a problem.
+- Do load plans work in Peanuts Native?
 - Read-only companion first, or touch actions (e.g. healing) later?
