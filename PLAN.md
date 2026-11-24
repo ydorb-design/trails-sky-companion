@@ -54,12 +54,13 @@ dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
 ## Phases
 
 ### Phase 0: Prerequisites (you)
-- [ ] Own the **Switch 1** version (Eden can't run the Switch 2 edition).
-- [ ] Dump it from your own Switch: game NSP (base + latest update), `prod.keys`, firmware.
-- [ ] A Linux machine for the desktop dev build (native Linux, or WSL2 on Windows; to confirm).
-- [ ] A dual-screen Android handheld for final testing (or a phone/tablet, since Eden Duo 1.4.0
-      supports single-screen shared mode).
-- [ ] Build and play FF Resonance in Peanuts Native on your handheld.
+- [x] Own the **Switch 1** version and dump it (NSP + update, `prod.keys`, firmware).
+- [x] Dual-screen handheld: **AYN Thor** (Peanuts Native's own test device).
+- [x] Build and play FF Resonance in Peanuts Native on the Thor.
+- [ ] Dev machine: **native Linux** (the Eden Duo docs and tools are written for it).
+- [ ] Claude Code installed on the Linux machine, this repo cloned there.
+- [ ] Copy the NSP, update, `prod.keys` and firmware to `~/ffres-files/` (outside the repo,
+      never committed).
 - [ ] Confirm the game also boots in Eden Duo on the desktop (needed for the dev tools).
 
 ### Phase 1: Dev environment
