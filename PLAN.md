@@ -128,11 +128,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] Record the **build ID** of the 1.0.3 `main`:
       `5EA394E096752EE3D04DEBFCEA6BF9114277D0B4`, so the data file is
       **`5EA394E096752EE3.json`**. Confirmed at runtime. Exefs is in `~/trails-files/dump/update/`.
-- [ ] Dump the romfs. The update NSP alone gives a mostly empty 25 GB tree (an update is only a
-      delta), so take files from the running game with `EDEN_DSMOD_DUMP_ROMFS`, or dump the
-      base romfs from the XCI and overlay changed files. Not needed until Phase 3/4.
-
-### Phase 2: Design (Claude, since 2026-11-25; you review when you have time)
+- [x] Dump the romfs (2026-11-26): `eden-cli --dump-romfs` on the XCI, run from the test
+      profile, into `~/trails-files/romfs-base` (28 GB, base game only). hactool can't read this
+      game's compressed NCAs. Layout and useful files in `design/DATA.md` ("Game files").
 - [x] Mockups as images at 1240x1080 in `design/` (instead of Figma), based on screenshots from
       the desktop test runs: `design/field.png`, `design/battle.png`, drawn by
       `design/render.py` from the runtime's own primitives (rects, labels, values, bars).
