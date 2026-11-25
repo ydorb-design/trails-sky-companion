@@ -88,8 +88,11 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       never committed).
 - [x] Update 1.0.3 in `~/trails-files/update/v-trails_in_the_sky_2nd_chapter_v327680.nsp`.
 - [x] Base game dump `~/trails-files/Trails in the Sky 2nd Chapter.xci`.
-- [ ] Build and play it in Peanuts Native on the Thor; start a new game (see Save data).
-- [ ] Copy the Thor save to the desktop.
+- [ ] Build and play it in Peanuts Native on the Thor.
+- [x] First save, made on the desktop in Eden instead of the Thor (same build): after the
+      opening cutscenes, Estelle alone in the field, objective "Look for Cassius". Backed up to
+      `~/trails-files/saves/2026-11-25-after-opening/` (slots `save000`, `save015`).
+- [ ] More saves: just before the first battle, and in a town.
 - [x] Confirm the game also boots in Eden Duo on the desktop: reaches the title screen
       (Ver.1.03) with the update applied, menu input works (2026-11-25).
 
