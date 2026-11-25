@@ -133,6 +133,11 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
   needs an address that holds a *pointer* to the text, so the package uses the UI's own pointer
   to that buffer: `[[[main+0x8791a0]+0x1f08]+0x92d0]+0xfd68` -> text (found on boot 1, checked
   on boot 4). Before anything is targeted the buffer holds stale text (the game's title).
+  The targeted *unit* is not found yet (it would let the page mark the targeted row and drop the
+  stale title): on 2026-11-26 no pointer to a unit or slot within 0x20000 bytes of any object
+  behind `main+0x878000..0x87b000` changed when the target moved (right stick, held ~1 s,
+  changes target in a command battle; short pushes and the D-pad don't). `[[main+0x8791a0]+0x4878]`
+  and `[[main+0x879618]+0x9a78]` point at the first enemy unit and did not follow the target.
 - **Brave Gauge** (field HUD gear, 0..5): u32 at `[[main+0x879470]+0x6540]+0x4c`. Followed
   5 -> 3 -> 1 -> 2 -> 0 through two Brave Rushes (ZR, -2 each) and attacks (refill); shows 5 on
   a second boot. It may be the HUD gear's own number rather than the battle state, but it is
