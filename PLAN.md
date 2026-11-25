@@ -156,10 +156,14 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] **Character table found and verified** (details in `design/DATA.md`):
       `[main+0x879628] + 0x1145A4 + id*0x39C0` = HP, with level, EXP, max HP, EP, CP nearby.
       Confirmed on two boots with two saves, sentinel-tested (CP write showed on the HUD).
-- [ ] Next: party order (which ids are in the party), mira, then battle data (enemy HP, and
-      turn order once a command battle can be triggered).
-- [ ] Turn each value into a stable pointer chain; confirm on a second boot.
-- [ ] Decide: plain JSON pointer chains vs a native module (probably needed for battle).
+- [x] Mira found and sentinel-tested.
+- [x] **Battle data (2026-11-25):** Y switches a field fight to a command battle. The battle
+      slot array under `[main+0x879470]` gives every enemy's level and live HP (chain checked
+      on four boots, companion followed a test write); slot 0 being filled marks a command
+      battle; Brave Gauge and the targeted enemy's name found too. Details in `design/DATA.md`.
+- [ ] Still open: party order, turn order, enemy names for every slot (needs the monster table
+      from the romfs; only the targeted enemy's name is available now).
+- [x] Plain JSON pointer chains are enough so far; no native module needed.
 - [ ] Look into the game's file formats (fonts, text tables, portraits) for later art decoding.
 
 ### Phase 4: Build the package
@@ -169,7 +173,11 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       `min_runtime` 24. Shows level, HP/EP/CP with bars for every joined character, and mira.
       Tested headless in Eden Duo: loads, values match the game, updates live (HP write showed
       within a second).
-- [ ] Party order (who is in the active party), then the battle page.
+- [x] **v0.2.0 (2026-11-25): Battle page.** Enemy rows (level, HP number and bar, packed so
+      empty slots leave no gap), target name, Brave Gauge, party strip; Brave Gauge also on the
+      Party page; Party/Battle tabs; switches to Battle by itself when a command battle starts
+      and back afterwards. Tested headless on the slug fight. Turn order shows "not found yet".
+- [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.
 

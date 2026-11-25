@@ -16,7 +16,7 @@ import sys
 
 import numpy as np
 
-DTYPES = {
+DTYPES = {"u8": "<u1", 
     "u16": np.dtype("<u2"), "u32": np.dtype("<u4"), "s32": np.dtype("<i4"),
     "u64": np.dtype("<u8"), "f32": np.dtype("<f4"), "f64": np.dtype("<f8"),
 }

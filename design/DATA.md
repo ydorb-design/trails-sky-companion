@@ -73,7 +73,7 @@ current HP. The bars had a dark tail.
 |---|---|---|---|
 | `mira` | money: u32 at `object+0x20B648` | 1000 (battle save), 0 (town save) | checked |
 | `playtime` | f64 seconds at `object+0x20B650` (counts up while playing) | ~729 s | found |
-| `brave` | Brave Gauge points (field HUD gear, 0..5) | 5 | - |
+| `brave` | Brave Gauge points (field HUD gear, 0..5): see Battle | 5 | chain |
 | `area.name` | current area (text id) | Balstar Channel | - |
 | `quest.objective` | objective line under the minimap (text id) | Explore the Balstar Channel | - |
 | `mode` | field / field battle / command battle / menu / cutscene | field | - |
@@ -84,7 +84,7 @@ The remake fights first in real time on the field (enemy HP bars over heads, Bra
 ZR). **Y** switches a field fight to a turn-based command battle (from the game's own
 "Preemptive Brave Attack" tutorial; scripted fights may start in command mode directly).
 
-### Battle slot array (found 2026-11-25, boot with main at 0x80552000; second boot pending)
+### Battle slot array (found 2026-11-25; chain checked on four boots: main at 0x80552000, 0x801cc000, 0x80a94000, 0x801f0000)
 
 `R = [main+0x879470]`. From `R+0xba0` there is an array of 0x30-byte **battle slots**:
 
@@ -104,6 +104,12 @@ are different classes:
 - **party unit:** `[U+0x3440]` = that character's record in the character table (level field
   minus 4, i.e. HP-0xc).
 
+**In a command battle or not:** slot 0's unit `[[R+0xbb0]+0]` is non-zero only during a
+command battle (empty in the field, during a real-time field fight, and after the battle).
+`R+0xb90` is NOT a battle flag (1 in the frog fight, 0 in the slug fight). Dead enemies drop
+out of their slot (it reads empty); reinforcements can land in later slots, leaving gaps
+(frog fight: slots 2, 3, then 5, 6 with 4 empty), so the page scans slots 0-11 and packs.
+
 Data-file chain for enemy HP in slot i: `["main+0x879470", {offset 0xbb0, stride 0x30,
 index $i}, "0x0", "0x1d00", "0x0"]`, offset `0xc`. Checked live against the game's target
 panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Frog
@@ -111,8 +117,15 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
 
 ### Other battle findings
 
-- **Targeted enemy's name** (cstring): `[[main+0x8791a8]+0x238]+0x720`, the target panel's
-  text ("Sticky Slug", "Ripple Frog"). Same address in both fights of one boot.
+- **Targeted enemy's name:** the target panel's text sits inline at
+  `[[main+0x8791a8]+0x238]+0x720` ("Sticky Slug", "Ripple Frog"). The runtime's `cstring` type
+  needs an address that holds a *pointer* to the text, so the package uses the UI's own pointer
+  to that buffer: `[[[main+0x8791a0]+0x1f08]+0x92d0]+0xfd68` -> text (found on boot 1, checked
+  on boot 4). Before anything is targeted the buffer holds stale text (the game's title).
+- **Brave Gauge** (field HUD gear, 0..5): u32 at `[[main+0x879470]+0x6540]+0x4c`. Followed
+  5 -> 3 -> 1 -> 2 -> 0 through two Brave Rushes (ZR, -2 each) and attacks (refill); shows 5 on
+  a second boot. It may be the HUD gear's own number rather than the battle state, but it is
+  what the player sees. The partial fill between points is not mapped.
 - **Spawn table** at `object+0x260024` (stride 0x2F0, HP-relative like the character table):
   every monster spawned on the map. `HP-0x3c` (s32) is non-zero for monsters in the current
   battle (9 in the scripted slug fight, 1 in the frog fight). `HP-0x38` u32 = species key
@@ -132,7 +145,19 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
 |---|---|---|---|
 | `enemy.count` | enemies alive | 4 at the start of the Balstar fight | found (group count) |
 | `e{e}.id` | enemy type (species key) | 0xb6f62854 | found (spawn table) |
-| `e{e}.hp` / `e{e}.hp_max` | enemy HP | 272/1676 | found (slot array, 2 fights) |
-| `target.name` | targeted enemy's name | Ripple Frog | found |
-| `turn.{i}.unit` | command battle: who acts i-th | - | - |
+| `e{e}.hp` / `e{e}.hp_max` | enemy HP | 272/1676 | checked (4 boots; companion followed a write of 999) |
+| `target.name` | targeted enemy's name | Ripple Frog | chain (2 boots) |
+| `brave` | Brave Gauge points | 5 | chain (2 boots) |
+| `in_battle` | command battle running | - | chain (slot 0 unit) |
+| `turn.{i}.unit` | command battle: who acts i-th. Not found: no per-unit delay field changed in the enemy units across a turn, and the arrays holding several unit pointers (e.g. one at 0x119fcb9a40 = FrogA, Estelle, Anelace, FrogB) did not follow the on-screen order | - | - |
 | `turn.{i}.bonus` | command battle: turn bonus on that slot | - | - |
+
+### Test-harness notes (2026-11-25)
+
+- After a failed read the gdbstub can leave the game halted even though the script sent `c`:
+  every screenshot shows the same frame. `tools/gdbmem.py info` continues it.
+- The game autosaves (save015) after battles, in the test profile. Reset the test profile's
+  saves from `~/trails-files/saves/2026-11-25-battle-and-town/savedata` before a run that needs
+  the pre-fight state; the Load list's 2nd entry is then the pre-slug battle save again.
+- Field positions: the leader's recent positions are a ring of xyz floats at
+  `object+0x20b6a0` (newest = last changed entry); scratch navigation tools used it.
