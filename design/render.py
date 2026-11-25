@@ -1,89 +1,223 @@
 #!/usr/bin/env python3
-"""Draw the companion page mockups at the real canvas size (1240x1080).
+"""Draw the companion page mockups at the real canvas size (1240x1080), in the game's UI style.
 
 usage: design/render.py            writes design/field.png and design/battle.png
 
-Only the primitives the companion runtime has: rectangles (optionally rounded), text labels,
-numeric values and bars. Values are the reference values from the test saves (design/DATA.md).
-Portraits are placeholder discs; the real portraits get decoded from the player's romfs later.
+Style taken from the game's own screens (camp menu, Load screen, dialogue, field HUD):
+light marble background, cream parchment panels with silver corner brackets, dark brown header
+bars with a teal accent, navy stat boxes with a bronze gear level badge, thin HP/EP/CP bars,
+italic outlined numbers, small-caps serif titles, cyan glow for the current item.
+
+In the real package the ornaments (frames, brackets, gear badge, bar art), the font and the
+portraits come from the game's own files, decoded from the player's romfs at runtime; here they
+are approximated with plain shapes. Values are the reference values from the test saves
+(design/DATA.md).
 """
+import math
 import os
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H = 1240, 1080
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT_DIR = "/usr/share/fonts/noto"
 
+# Sampled from the game's screens (see design/DATA.md for where each value comes from).
 C = {
-    "bg": "#0d1626", "panel": "#16233a", "panel_hi": "#1d2e4b", "edge": "#3a5378",
-    "gold": "#d8b35a", "text": "#eef2f8", "muted": "#9fb0c8", "faint": "#4a5f80",
-    "hp": "#f08a2c", "ep": "#3fb3e6", "cp": "#8fd14a", "enemy": "#d9534f",
-    "track": "#0a111d", "track_edge": "#2a3a55", "lv": "#5a2a12",
-    "estelle": "#c8642a", "anelace": "#7a5a3a",
+    "marble_hi": (220, 218, 222), "marble_lo": (195, 195, 192), "ornament": (178, 178, 176),
+    "cream": (226, 224, 215), "cream_edge": (178, 172, 158), "ink": (40, 36, 32),
+    "ink_soft": (110, 104, 96), "rule": (196, 192, 182),
+    "brown": (39, 34, 28), "brown_text": (236, 228, 206), "teal": (40, 140, 154),
+    "navy_a": (43, 66, 83), "navy_b": (30, 58, 76), "navy_edge": (120, 150, 170),
+    "track": (14, 26, 34),
+    "hp_a": (232, 92, 40), "hp_b": (255, 153, 49),
+    "ep_a": (40, 150, 220), "ep_b": (150, 215, 240),
+    "cp_a": (110, 200, 50), "cp_b": (206, 255, 132),
+    "en_a": (170, 30, 30), "en_b": (240, 90, 70),
+    "num_white": (255, 255, 255), "num_yellow": (249, 255, 91), "num_outline": (20, 22, 26),
+    "bronze": (140, 99, 50), "bronze_hi": (196, 150, 82), "bronze_dark": (65, 44, 22),
+    "silver": (205, 210, 214), "silver_dark": (120, 128, 136),
+    "metal_hi": (235, 237, 237), "metal_lo": (150, 170, 186), "metal_text_edge": (30, 50, 70),
+    "glow": (16, 241, 252), "gold": (216, 179, 90),
+    "estelle": (200, 100, 42), "anelace": (122, 90, 58), "enemy": (150, 60, 50),
 }
 
 
-def font(size, bold=False):
-    name = "NotoSans-Bold.ttf" if bold else "NotoSans-Regular.ttf"
+def font(kind, size):
+    name = {
+        "serif": "NotoSerif-Bold.ttf", "num": "NotoSans-BoldItalic.ttf",
+        "body": "NotoSans-Medium.ttf", "bold": "NotoSans-Bold.ttf",
+    }[kind]
     return ImageFont.truetype(os.path.join(FONT_DIR, name), size)
+
+
+def lerp(a, b, t):
+    return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
 
 
 class Page:
     def __init__(self):
-        self.img = Image.new("RGB", (W, H), C["bg"])
+        self.img = Image.new("RGB", (W, H))
         self.d = ImageDraw.Draw(self.img)
+        self.marble()
 
-    def rect(self, x, y, w, h, fill=None, outline=None, r=0, width=2):
-        self.d.rounded_rectangle((x, y, x + w - 1, y + h - 1), radius=r, fill=fill,
-                                 outline=outline, width=width)
+    # -- backgrounds and ornaments ----------------------------------------------------------
+    def marble(self):
+        for y in range(H):
+            self.d.line((0, y, W, y), fill=lerp(C["marble_hi"], C["marble_lo"], y / H))
+        # faint clockwork emblem, like the menu background line art
+        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ld = ImageDraw.Draw(layer)
+        cx, cy = 150, 640
+        col = C["ornament"] + (150,)
+        for r in (420, 360, 250, 150):
+            ld.ellipse((cx - r, cy - r, cx + r, cy + r), outline=col, width=6)
+        for k in range(36):
+            a = k * math.tau / 36
+            ld.line((cx + 360 * math.cos(a), cy + 360 * math.sin(a),
+                     cx + 420 * math.cos(a), cy + 420 * math.sin(a)), fill=col, width=5)
+        cx, cy = 1120, 980
+        for r in (260, 200):
+            ld.ellipse((cx - r, cy - r, cx + r, cy + r), outline=col, width=5)
+        self.img.paste(layer, (0, 0), layer)
 
-    def text(self, x, y, s, size, color="text", bold=False, anchor="la"):
-        self.d.text((x, y), s, font=font(size, bold), fill=C.get(color, color), anchor=anchor)
+    def shadow(self, box, radius=10, offset=(0, 6), alpha=90, blur=10):
+        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        x0, y0, x1, y1 = box
+        ImageDraw.Draw(layer).rounded_rectangle(
+            (x0 + offset[0], y0 + offset[1], x1 + offset[0], y1 + offset[1]),
+            radius=radius, fill=(0, 0, 0, alpha))
+        layer = layer.filter(ImageFilter.GaussianBlur(blur))
+        self.img.paste(layer, (0, 0), layer)
 
-    def bar(self, x, y, w, h, frac, color):
-        self.rect(x, y, w, h, fill=C["track"], outline=C["track_edge"], r=h // 2, width=1)
-        if frac > 0:
-            self.rect(x, y, max(h, int(w * frac)), h, fill=C[color], r=h // 2)
+    def glow(self, box, radius=10):
+        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(layer).rounded_rectangle(box, radius=radius, outline=C["glow"] + (255,),
+                                                width=8)
+        layer = layer.filter(ImageFilter.GaussianBlur(6))
+        self.img.paste(layer, (0, 0), layer)
+        self.d.rounded_rectangle(box, radius=radius, outline=C["glow"], width=3)
 
-    def disc(self, cx, cy, r, color, letter, size):
-        self.d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=C[color], outline=C["gold"], width=4)
-        self.text(cx, cy, letter, size, bold=True, anchor="mm")
+    # -- panels ---------------------------------------------------------------------------
+    def cream_panel(self, x, y, w, h):
+        self.shadow((x, y, x + w, y + h), radius=6)
+        self.d.rectangle((x, y, x + w, y + h), fill=C["cream"], outline=C["cream_edge"], width=2)
+        self.d.line((x + 3, y + 3, x + w - 3, y + 3), fill=(244, 242, 236), width=2)
+        # silver corner brackets with a small round boss, like the Load screen frames
+        L = 26
+        for cx, cy, sx, sy in ((x, y, 1, 1), (x + w, y, -1, 1), (x, y + h, 1, -1),
+                               (x + w, y + h, -1, -1)):
+            self.d.line((cx, cy + sy * 2, cx + sx * L, cy + sy * 2), fill=C["silver_dark"], width=4)
+            self.d.line((cx + sx * 2, cy, cx + sx * 2, cy + sy * L), fill=C["silver_dark"], width=4)
+            self.d.line((cx + sx * 3, cy + sy * 3, cx + sx * (L - 4), cy + sy * 3), fill=C["silver"],
+                        width=2)
+            self.d.ellipse((cx + sx * 7 - 5, cy + sy * 7 - 5, cx + sx * 7 + 5, cy + sy * 7 + 5),
+                           fill=C["silver"], outline=C["silver_dark"], width=2)
+
+    def header_bar(self, x, y, w, text, h=46, size=28):
+        """Dark brown bar with a teal accent at the left, like 'Information' and nameplates."""
+        self.d.rounded_rectangle((x, y, x + w, y + h), radius=h // 2, fill=C["brown"],
+                                 outline=(90, 78, 60), width=2)
+        self.d.rounded_rectangle((x + 4, y + 4, x + 16, y + h - 4), radius=6, fill=C["teal"])
+        self.d.text((x + 30, y + h // 2), text, font=font("body", size), fill=C["brown_text"],
+                    anchor="lm")
+
+    def metal_band(self, y, h, title, sub=None):
+        """Title band styled like the camp-menu tabs: brushed silver-blue metal, navy trim."""
+        self.shadow((0, y, W, y + h), radius=0, offset=(0, 4), alpha=70, blur=6)
+        for i in range(h):
+            t = i / h
+            col = lerp(C["metal_hi"], C["metal_lo"], t if t < .55 else 1 - (t - .55))
+            self.d.line((0, y + i, W, y + i), fill=col)
+        self.d.line((0, y, W, y), fill=C["metal_text_edge"], width=3)
+        self.d.line((0, y + h, W, y + h), fill=C["metal_text_edge"], width=3)
+        self.small_caps(40, y + h // 2 - (10 if sub else 0), title, 46)
+        if sub:
+            self.d.text((42, y + h - 20), sub, font=font("body", 22), fill=C["metal_text_edge"],
+                        anchor="ls")
+
+    def small_caps(self, x, y, text, size, fill=(255, 255, 255), outline=None):
+        """Serif small caps: capitals full size, the rest as smaller capitals (menu tab style)."""
+        outline = outline or C["metal_text_edge"]
+        big, small = font("serif", size), font("serif", int(size * .78))
+        for word_i, word in enumerate(text.split(" ")):
+            if word_i:
+                x += big.getlength(" ")
+            for ch in word:
+                f = big if ch.isupper() or not ch.isalpha() else small
+                ch = ch.upper()
+                self.d.text((x, y), ch, font=f, fill=fill, anchor="ls" if False else "lm",
+                            stroke_width=3, stroke_fill=outline)
+                x += f.getlength(ch)
+        return x
+
+    # -- stat pieces ------------------------------------------------------------------------
+    def number(self, x, y, text, size, color, anchor="rm"):
+        self.d.text((x, y), text, font=font("num", size), fill=C[color], anchor=anchor,
+                    stroke_width=max(2, size // 12), stroke_fill=C["num_outline"])
+
+    def bar(self, x, y, w, h, frac, col):
+        """Thin game bar: dark track, two-tone fill, light top edge."""
+        self.d.rectangle((x, y, x + w, y + h), fill=C["track"])
+        fw = int(w * max(0.0, min(1.0, frac)))
+        a, b = C[col + "_a"], C[col + "_b"]
+        for i in range(fw):
+            self.d.line((x + i, y + 1, x + i, y + h - 1), fill=lerp(a, b, i / max(1, w)))
+        if fw:
+            self.d.line((x, y + 1, x + fw, y + 1), fill=lerp(b, (255, 255, 255), .5))
+
+    def navy_box(self, x, y, w, h, slant=26):
+        """Navy stat box with a slanted right edge, like the camp-menu party boxes."""
+        self.shadow((x, y, x + w, y + h), radius=4)
+        poly = [(x, y), (x + w, y), (x + w - slant, y + h), (x, y + h)]
+        mask = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(mask).polygon(poly, fill=255)
+        grad = Image.new("RGB", (W, H))
+        gd = ImageDraw.Draw(grad)
+        for i in range(h + 1):
+            gd.line((x, y + i, x + w, y + i), fill=lerp(C["navy_a"], C["navy_b"], i / h))
+        self.img.paste(grad, (0, 0), mask)
+        self.d.line(poly + [poly[0]], fill=C["navy_edge"], width=2)
+
+    def gear_badge(self, cx, cy, r, text):
+        """Bronze gear with a dark centre and an italic number: the game's level badge."""
+        teeth = 12
+        pts = []
+        for k in range(teeth * 2):
+            a = k * math.pi / teeth
+            rr = r if k % 2 == 0 else r * .82
+            pts.append((cx + rr * math.cos(a), cy + rr * math.sin(a)))
+        self.d.polygon(pts, fill=C["bronze"], outline=C["bronze_dark"])
+        self.d.ellipse((cx - r * .74, cy - r * .74, cx + r * .74, cy + r * .74), fill=C["bronze_hi"])
+        self.d.ellipse((cx - r * .6, cy - r * .6, cx + r * .6, cy + r * .6), fill=C["bronze_dark"])
+        self.number(cx, cy, text, int(r * .9), "num_white", anchor="mm")
+
+    def portrait(self, cx, cy, r, col, letter, glow=False):
+        """Round portrait with a silver ring (field HUD style). Real art comes from the game."""
+        if glow:
+            self.glow((cx - r - 8, cy - r - 8, cx + r + 8, cy + r + 8), radius=r + 8)
+        self.d.ellipse((cx - r - 6, cy - r - 6, cx + r + 6, cy + r + 6), fill=C["silver_dark"])
+        self.d.ellipse((cx - r - 3, cy - r - 3, cx + r + 3, cy + r + 3), fill=C["silver"])
+        self.d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=C[col])
+        self.d.ellipse((cx - r + 4, cy - r + 4, cx + r - 4, cy + r - 4),
+                       outline=lerp(C[col], (255, 255, 255), .25), width=2)
+        self.d.text((cx, cy), letter, font=font("serif", int(r * .9)), fill=(255, 255, 255),
+                    anchor="mm", stroke_width=2, stroke_fill=(60, 40, 30))
+
+    def stat_rows(self, x, y, w, rows, label_size=26, num_size=34, gap=40, bar_h=10):
+        """HP/EP/CP rows: condensed label, thin bar under the number, italic outlined value."""
+        for i, (label, cur, mx, col, ncol) in enumerate(rows):
+            ry = y + i * gap
+            self.d.text((x, ry), label, font=font("bold", label_size), fill=(240, 244, 248),
+                        anchor="lm", stroke_width=2, stroke_fill=C["num_outline"])
+            bx = x + label_size * 1.7
+            self.bar(int(bx), ry + 6, int(w - (bx - x)), bar_h, cur / mx, col)
+            self.number(x + w, ry - 4, str(cur), num_size, ncol)
 
     def save(self, name):
         path = os.path.join(HERE, name)
         self.img.save(path)
         print(path)
-
-
-def strip(p, title, subtitle, chips, objective_mark=False):
-    p.rect(0, 0, W, 120, fill=C["panel"])
-    p.rect(0, 117, W, 3, fill=C["gold"])
-    p.text(32, 14, title, 40, bold=True)
-    x = 32
-    if objective_mark:
-        p.text(x, 66, "!", 26, color="hp", bold=True)
-        x += 24
-    p.text(x, 66, subtitle, 26, color="muted")
-    right = W - 32
-    for label, value in reversed(chips):
-        w = 200
-        p.rect(right - w, 22, w, 76, fill=C["panel_hi"], outline=C["edge"], r=12)
-        p.text(right - w + 20, 60, label, 20, color="gold", bold=True, anchor="lm")
-        p.text(right - 20, 60, value, 34, bold=True, anchor="rm")
-        right -= w + 18
-
-
-def stat_row(p, x, y, w, key, frac, color, value, vmax=None, vw=230, ksize=24, vsize=30):
-    p.text(x, y + 11, key, ksize, color="muted", bold=True, anchor="lm")
-    bx = x + ksize * 2 + 8
-    bw = w - (bx - x) - vw - 10
-    p.bar(bx, y, bw, 22, frac, color)
-    vx = x + w
-    if vmax is not None:
-        p.text(vx, y + 11, f" / {vmax}", 22, color="muted", anchor="rm")
-        vx -= font(22).getlength(f" / {vmax}")
-    p.text(vx, y + 11, str(value), vsize, bold=True, anchor="rm")
 
 
 PARTY = [
@@ -92,68 +226,103 @@ PARTY = [
 ]
 
 
+def party_card(p, x, y, member):
+    """One party slot: portrait above, navy stat box with gear badge below (camp-menu layout)."""
+    w = 560
+    if member is None:
+        p.d.rectangle((x, y + 150, x + w, y + 340), outline=C["ornament"], width=3)
+        p.d.text((x + w // 2, y + 245), "—", font=font("serif", 40), fill=C["ornament"],
+                 anchor="mm")
+        return
+    name, col, lv, hp, ep, cp = member
+    p.portrait(x + w // 2, y + 96, 92, col, name[0])
+    p.navy_box(x, y + 172, w, 176)
+    p.gear_badge(x + 30, y + 178, 40, str(lv))
+    p.d.text((x + 82, y + 200), name, font=font("body", 34), fill=(255, 255, 255), anchor="lm",
+             stroke_width=2, stroke_fill=C["num_outline"])
+    p.stat_rows(x + 30, y + 250, w - 80, [
+        ("HP", hp[0], hp[1], "hp", "num_white"),
+        ("EP", ep[0], ep[1], "ep", "num_yellow"),
+        ("CP", cp[0], cp[1], "cp", "num_yellow"),
+    ])
+
+
 def field_page():
     p = Page()
-    strip(p, "Balstar Channel", "Explore the Balstar Channel",
-          [("BRAVE", "5"), ("MIRA", "1000")], objective_mark=True)
-    for i in range(4):
-        y = 152 + i * 220
-        if i >= len(PARTY):
-            p.rect(32, y, 1176, 200, outline=C["track_edge"], r=16)
-            p.text(W // 2, y + 100, f"party slot {i + 1}", 28, color="faint", anchor="mm")
-            continue
-        name, col, lv, hp, ep, cp = PARTY[i]
-        p.rect(32, y, 1176, 200, fill=C["panel"], outline=C["edge"], r=16)
-        p.disc(132, y + 100, 80, col, name[0], 64)
-        p.d.ellipse((164, y + 128, 228, y + 192), fill=C["lv"], outline=C["gold"], width=3)
-        p.text(196, y + 160, str(lv), 26, bold=True, anchor="mm")
-        p.text(252, y + 18, name, 38, bold=True)
-        for j, (k, v, c) in enumerate((("HP", hp, "hp"), ("EP", ep, "ep"), ("CP", cp, "cp"))):
-            stat_row(p, 252, y + 80 + j * 40, 930, k, v[0] / v[1], c, v[0], v[1])
-    p.text(32, H - 34, "Field page: party at a glance. Tap a card for that character's status "
-           "(later).", 20, color="faint")
+    p.metal_band(0, 96, "Balstar Channel")
+    # Brave Gauge as an orange gear on the band, like the field HUD
+    p.gear_badge(1170, 48, 38, "5")
+    p.d.text((1118, 48), "BRAVE", font=font("serif", 20), fill=C["metal_text_edge"], anchor="rm")
+
+    p.cream_panel(32, 122, 1176, 118)
+    p.header_bar(52, 138, 260, "Objective")
+    p.d.text((60, 206), "Explore the Balstar Channel", font=font("body", 30), fill=C["ink"],
+             anchor="lm")
+    p.d.line((860, 140, 860, 222), fill=C["rule"], width=2)
+    p.small_caps(892, 180, "Mira", 26, fill=C["gold"], outline=C["brown"])
+    p.d.text((1180, 182), "1000", font=font("num", 44), fill=C["ink"], anchor="rm")
+
+    slots = PARTY + [None, None]
+    for i, member in enumerate(slots):
+        party_card(p, 40 + (i % 2) * 600, 268 + (i // 2) * 400, member)
     p.save("field.png")
 
 
 def battle_page():
     p = Page()
-    strip(p, "Battle — Balstar Channel", "4 enemies", [("BRAVE", "5")])
-    p.text(32, 140, "ENEMIES", 24, color="gold", bold=True)
-    enemies = [("Enemy 1", 0.72, False), ("Enemy 2", 1.0, False), ("Enemy 3", 1.0, False),
-               ("Enemy 4", 0.0, True)]
-    for i, (name, frac, dead) in enumerate(enemies):
-        y = 176 + i * 120
-        p.rect(32, y, 760, 104, fill=C["panel"], outline=C["edge"], r=12)
-        p.text(54, y + 12, name, 30, color="faint" if dead else "text", bold=True)
-        p.text(770, y + 30, "0 / —" if dead else "— / —", 28, color="faint" if dead else "text",
-               bold=True, anchor="rm")
-        p.bar(54, y + 66, 716, 20, frac, "enemy")
+    p.metal_band(0, 96, "Battle", sub="Balstar Channel")
+    p.gear_badge(1170, 48, 38, "5")
+    p.d.text((1118, 48), "BRAVE", font=font("serif", 20), fill=C["metal_text_edge"], anchor="rm")
 
-    p.text(824, 140, "TURN ORDER", 24, color="gold", bold=True)
-    p.rect(824, 176, 384, 600, fill=C["panel"], outline=C["edge"], r=12)
-    turns = [("Estelle", "estelle", "", True), ("Enemy 2", "enemy", "", False),
-             ("Anelace", "anelace", "HP +10%", False), ("Enemy 1", "enemy", "", False),
-             ("Enemy 3", "enemy", "", False), ("Estelle", "estelle", "CRIT", False),
-             ("Enemy 2", "enemy", "", False), ("Anelace", "anelace", "", False)]
-    for i, (name, col, bonus, now) in enumerate(turns):
-        y = 192 + i * 72
-        p.rect(840, y, 352, 62, fill=C["panel_hi"], outline=C["gold"] if now else None,
-               r=10, width=3)
-        p.d.ellipse((854, y + 11, 894, y + 51), fill=C[col])
-        p.text(908, y + 31, name, 26, bold=True, anchor="lm")
+    # enemies: cream rows like the Load screen, nameplate like the dialogue speaker tag
+    # enemy names and HP are illustrative until the battle data is found
+    enemies = [("Enemy 1", 812, 1130, "target"), ("Enemy 2", 1130, 1130, ""),
+               ("Enemy 3", 1130, 1130, ""), ("Enemy 4", 0, 1130, "dead")]
+    for i, (name, ehp, emax, state) in enumerate(enemies):
+        frac = ehp / emax
+        x, y, w, h = 32, 126 + i * 132, 760, 112
+        p.cream_panel(x, y, w, h)
+        if state == "target":
+            p.glow((x - 2, y - 2, x + w + 2, y + h + 2), radius=4)
+        p.header_bar(x + 18, y + 14, 250, name, h=40, size=24)
+        p.number(x + w - 24, y + 36, str(ehp), 34, "num_white")
+        p.bar(x + 24, y + 72, w - 48, 16, frac, "en")
+        if state == "dead":
+            veil = Image.new("RGBA", (w + 4, h + 4), C["marble_lo"] + (150,))
+            p.img.paste(veil, (x - 2, y - 2), veil)
+
+    # turn order: navy column of portraits, the one acting now glows
+    p.navy_box(824, 126, 384, 652, slant=0)
+    p.small_caps(848, 160, "Turn Order", 26, fill=(255, 255, 255), outline=C["num_outline"])
+    turns = [("Estelle", "estelle", ""), ("Enemy 2", "enemy", ""),
+             ("Anelace", "anelace", "HP +10%"), ("Enemy 1", "enemy", ""),
+             ("Enemy 3", "enemy", ""), ("Estelle", "estelle", "Crit"),
+             ("Enemy 2", "enemy", "")]
+    for i, (name, col, bonus) in enumerate(turns):
+        y = 214 + i * 80 + (14 if i else 0)
+        r = 34 if i == 0 else 26
+        p.portrait(880, y + 4, r, col, name[0], glow=(i == 0))
+        p.d.text((934, y + 4), name, font=font("body", 30 if i == 0 else 26),
+                 fill=(255, 255, 255), anchor="lm", stroke_width=2, stroke_fill=C["num_outline"])
         if bonus:
-            p.text(1180, y + 31, bonus, 20, color="gold", bold=True, anchor="rm")
+            bw = font("bold", 18).getlength(bonus) + 26
+            p.d.rounded_rectangle((1188 - bw, y - 12, 1188, y + 18), radius=13, fill=C["brown"],
+                                  outline=C["gold"], width=2)
+            p.d.text((1188 - bw / 2, y + 3), bonus, font=font("bold", 18), fill=C["gold"],
+                     anchor="mm")
 
-    live = [(1543, 2035), (85, 85), (200, 200)], [(1544, 2090), (80, 80), (200, 200)]
-    for i, ((name, col, *_), vals) in enumerate(zip(PARTY, live)):
-        y = 808 + i * 132
-        p.rect(32, y, 1176, 120, fill=C["panel"], outline=C["edge"], r=12)
-        p.disc(76, y + 60, 44, col, name[0], 38)
-        p.text(140, y + 8, name, 28, bold=True)
-        for j, ((v, vmax), (k, c)) in enumerate(zip(vals, (("HP", "hp"), ("EP", "ep"),
-                                                             ("CP", "cp")))):
-            stat_row(p, 140 + j * 352, y + 66, 330, k, v / vmax, c, v, vw=96, ksize=20,
-                     vsize=24)
+    # party: field-HUD style rows
+    live = [((1543, 2035), (85, 85), (200, 200)), ((1544, 2090), (80, 80), (200, 200))]
+    for i, (member, (hp, ep, cp)) in enumerate(zip(PARTY, live)):
+        y = 806 + i * 136
+        name, col = member[0], member[1]
+        p.navy_box(120, y + 8, 1088, 112)
+        p.portrait(84, y + 64, 56, col, name[0])
+        p.d.text((172, y + 36), name, font=font("body", 30), fill=(255, 255, 255), anchor="lm",
+                 stroke_width=2, stroke_fill=C["num_outline"])
+        p.stat_rows(172, y + 84, 330, [("HP", hp[0], hp[1], "hp", "num_white")], num_size=30)
+        p.stat_rows(540, y + 84, 260, [("EP", ep[0], ep[1], "ep", "num_yellow")], num_size=30)
+        p.stat_rows(838, y + 84, 300, [("CP", cp[0], cp[1], "cp", "num_yellow")], num_size=30)
     p.save("battle.png")
 
 
