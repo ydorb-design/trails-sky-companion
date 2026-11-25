@@ -15,6 +15,7 @@ at run time (decoded from raw NVN XTX by the runtime).
 """
 import json
 import os
+import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +26,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.4.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.5.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -35,13 +36,29 @@ IMG = os.path.join(DS, "img")
 CHAR_HP = 0x1145A4
 CHAR_STRIDE = 0x39C0
 SLOTS = 4                              # first four table entries (v1: joined = level > 0)
-NAMES = ["Estelle", "Anelace", "Member 3", "Member 4"]   # ids 2+ not identified yet
-COLOURS = ["estelle", "anelace", "enemy", "enemy"]
-# The game's own pictures, read from the player's romfs at run time (nothing is shipped):
-# character id per table entry (None = not identified yet). avfc<id> is a 256x256 bust,
-# at_c<id> the 128x64 AT-bar face.
-CHAR_IDS = ["5000", "5101", None, None]
+# Each table entry holds its character id (u32 at HP-0xc). design/characters.json (made by
+# tools/extract_chars.py from t_name/t_status) maps the id to the name the game shows and to
+# its picture key; the pictures themselves are read from the player's romfs at run time.
+CHARS = {int(k): v for k, v in
+         json.load(open(os.path.join(ROOT, "design", "characters.json"))).items()}
+PIC_IDS = 200                          # ids above this are one-off guests without pictures
 ROMFS_IMG = "romfs:/asset/nx/image/"
+
+
+def char_pictures(kind):
+    """src_names list indexed by character id: kind "bust" (avfc) or "face" (at_c)."""
+    out = []
+    for cid in range(PIC_IDS):
+        c = CHARS.get(cid)
+        if c and c[kind]:
+            out.append(f"{ROMFS_IMG}avfc{c['key'][1:]}.xtx" if kind == "bust"
+                       else f"{ROMFS_IMG}at_{c['key']}.xtx")
+        else:
+            out.append("file:img/portrait_q.png" if kind == "bust" else "file:img/face_q.png")
+    return out
+
+
+CHAR_NAMES = {str(cid): c["name"] for cid, c in CHARS.items()}
 # Every AT-bar icon key in the game (file names only, from the base romfs: at_<key>.xtx). A
 # unit record's +0x40 names its key ("c5000", "m5201", "m5201_b").
 AT_KEYS = [k for k in open(os.path.join(ROOT, "design", "at_icon_keys.txt")).read().split()]
@@ -109,6 +126,7 @@ def data_file():
                     "Brave Gauge u32 at [R+0x6540]+0x4c. Unit name: [[unit+0x1b0]+0x198] -> text. "
                     "See design/DATA.md."),
         "points": {
+            "cid": field(-0x0c),
             "lv": field(-0x08),
             "hp": field(0x00),
             "hpmax": field(0x04),
@@ -137,7 +155,8 @@ def data_file():
 # -- artwork --------------------------------------------------------------------------------
 
 def art():
-    os.makedirs(IMG, exist_ok=True)
+    shutil.rmtree(IMG, ignore_errors=True)   # generated: start clean, no stale pictures
+    os.makedirs(IMG)
     # background: marble, title band, mira panel (text drawn by the runtime)
     p = Page()
     p.metal_band(0, 96, "Party")
@@ -185,12 +204,17 @@ def art():
                  stroke_width=2, stroke_fill=C["num_outline"])
     p.img.save(os.path.join(IMG, "party_row.png"))
 
-    # portraits: a plain ring for members whose bust comes from the game, a lettered
-    # placeholder for the ones not identified yet
-    for i in range(SLOTS):
-        p = Page((200, 200), transparent=True)
-        p.portrait(100, 100, 92, COLOURS[i], "" if CHAR_IDS[i] else NAMES[i][0])
-        p.img.save(os.path.join(IMG, f"portrait_{i}.png"))
+    # portrait ring (the game's bust is drawn over it) and "?" pictures for an id without one
+    p = Page((200, 200), transparent=True)
+    p.portrait(100, 100, 92, "anelace", "")
+    p.img.save(os.path.join(IMG, "portrait_ring.png"))
+    p = Page((200, 200), transparent=True)
+    p.portrait(100, 100, 92, "anelace", "?")
+    p.img.save(os.path.join(IMG, "portrait_q.png"))
+    p = Page((128, 64), transparent=True)
+    p.d.text((64, 32), "?", font=font("serif", 44), fill=(255, 255, 255), anchor="mm",
+             stroke_width=2, stroke_fill=(60, 40, 30))
+    p.img.save(os.path.join(IMG, "face_q.png"))
 
 
 # -- manifest -------------------------------------------------------------------------------
@@ -213,6 +237,10 @@ def brave_digit(cx, cy):
             "text_scale": 4, "italic": True, "color": rgba("num_white")}
 
 
+BUSTS = char_pictures("bust")
+FACES = char_pictures("face")
+
+
 def party_page():
     w = [{"type": "image", "rect": [0, 0, 1240, 1080], "src": "file:img/bg_party.png"}]
     w += tabs("party")
@@ -223,17 +251,18 @@ def party_page():
         x, y = card_origin(i)
         show = f"lv{i}"
         w.append({"type": "image", "rect": [x + CARD_W // 2 - 100, y - 4, 200, 200],
-                  "src": f"file:img/portrait_{i}.png", "need_bind": show})
-        if CHAR_IDS[i]:
-            # the game's bust (drawn under the card, which covers the shoulders)
-            w.append({"type": "image", "rect": [x + CARD_W // 2 - 115, y - 62, 230, 230],
-                      "src": f"{ROMFS_IMG}avfc{CHAR_IDS[i]}.xtx", "need_bind": show})
+                  "src": "file:img/portrait_ring.png", "need_bind": show})
+        # the game's bust for this member's character id (under the card, which covers the
+        # shoulders); "?" for an id without one
+        w.append({"type": "image", "rect": [x + CARD_W // 2 - 115, y - 62, 230, 230],
+                  "bind": f"cid{i}", "src_names": BUSTS, "need_bind": show})
         w.append({"type": "image", "rect": [x, y, CARD_W + 20, CARD_H + 30],
                   "src": "file:img/card.png", "need_bind": show})
         w.append({"type": "value", "rect": [x + 30, y + 166, 0, 0], "bind": f"lv{i}",
                   "align": "center", "text_scale": 3, "italic": True,
                   "color": rgba("num_white"), "need_bind": show})
-        w.append({"type": "label", "rect": [x + 82, y + 186, 0, 0], "text": NAMES[i],
+        w.append({"type": "label", "rect": [x + 82, y + 186, 0, 0], "text_bind": f"cid{i}",
+                  "text_map": CHAR_NAMES,
                   "text_scale": 4, "color": rgba("num_white"), "need_bind": show})
         for k, (key, col, ncol) in enumerate((("hp", "hp_b", "num_white"),
                                               ("ep", "ep_b", "num_yellow"),
@@ -280,10 +309,10 @@ def battle_page():
         show = f"lv{i}"
         w.append({"type": "image", "rect": [40, y, 1180, 66], "src": "file:img/party_row.png",
                   "need_bind": show})
-        if CHAR_IDS[i]:
-            w.append({"type": "image", "rect": [52, y + 5, 112, 56],
-                      "src": f"{ROMFS_IMG}at_c{CHAR_IDS[i]}.xtx", "need_bind": show})
-        w.append({"type": "label", "rect": [172, y + 20, 0, 0], "text": NAMES[i],
+        w.append({"type": "image", "rect": [52, y + 5, 112, 56], "bind": f"cid{i}",
+                  "src_names": FACES, "need_bind": show})
+        w.append({"type": "label", "rect": [172, y + 20, 0, 0], "text_bind": f"cid{i}",
+                  "text_map": CHAR_NAMES,
                   "text_scale": 3, "color": rgba("num_white"), "need_bind": show,
                   "wrap_width": 110, "max_lines": 1})
         for key, x, wbar, col, ncol in (("hp", 340, 280, "hp_b", "num_white"),

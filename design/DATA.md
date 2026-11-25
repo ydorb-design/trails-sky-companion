@@ -152,7 +152,11 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
   5 Agate, 6 Tita, 7 Zin, 8 Kevin, 9 Anelace (`chr5101p`), 10 Kurt, 11 Captain Schwarz,
   12 Mueller, 13 Josette, then guests and NPCs (a second Estelle `chr5344p`, Dorothy, Renne...).
   So the character table the package reads (`O+0x1145A4 + i*0x39C0`, Anelace at i = 1) is
-  **not** indexed by character id: it is in join or party order. No memory copy stores the
+  **not** indexed by character id: it is in join or party order. **Each entry stores its
+  character id as a u32 at HP-0xc** (Estelle 0, Anelace 101 on two boots; the game's ids from
+  `t_name.tbl`, e.g. Joshua 1, Kurt 100, Kevin 119, Renne 158). The package maps it to the name
+  and pictures (`design/characters.json`, made by `tools/extract_chars.py`); a test write of 1
+  into Anelace's entry made the card show Joshua. No memory copy stores the
   stats by character id (Estelle and Anelace are adjacent everywhere). There are three
   0x39C0-stride copies (HP at 0x118bd645d4, 0x118bf70324, 0x118c3a4814 on that boot; the first
   is the one at `O+0x1145A4`) and a 0x224-stride one at 0x11436f454c. With a two-member party

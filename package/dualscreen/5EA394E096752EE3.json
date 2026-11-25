@@ -3,6 +3,16 @@
  "_build": "1.0.3 (v327680), build 5EA394E096752EE3D04DEBFCEA6BF9114277D0B4",
  "_layout": "object O = [main+0x879628] (alias region). Character table at O+0x1145A4 + id*0x39C0 = HP; -8 level, -4 EXP, +4 max HP, +8/+0xC EP/max, +0x10/+0x14 CP/max. Mira u32 at O+0x20B648. Battle: R=[main+0x879470], slot i S=[R+0xbb0+i*0x30], unit [S], enemy stats [unit+0x1d00] (+0xc HP, +0x10 max, +4 level); [R+0xbb0]+0 (slot 0's unit) is non-zero only in a command battle. Brave Gauge u32 at [R+0x6540]+0x4c. Unit name: [[unit+0x1b0]+0x198] -> text. See design/DATA.md.",
  "points": {
+  "cid": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x114598",
+   "count": 4,
+   "stride": 14784
+  },
   "lv": {
    "type": "u32",
    "ptr": [

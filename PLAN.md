@@ -189,6 +189,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       party (`at_c<id>`) and every enemy's AT icon via `sprite_map` keyed by the record's icon
       key (457 keys, `design/at_icon_keys.txt`). Tested headless. Whether Peanuts' runtime 24
       decodes plain `romfs:` XTX is untested; if it doesn't, the pictures are just missing.
+- [x] **v0.5.0 (2026-11-26): Party names and pictures by character id.** Each character-table
+      entry holds its id (HP-0xc); names (`text_map`) and pictures (`src_names`) follow it, so
+      new members show up correctly (checked with a test write: Anelace -> Joshua).
 - [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.

@@ -1,0 +1,198 @@
+{
+ "0": {
+  "name": "Estelle",
+  "key": "c5000",
+  "model": "chr5000p",
+  "face": true,
+  "bust": true
+ },
+ "1": {
+  "name": "Joshua",
+  "key": "c0001",
+  "model": "chr0001p",
+  "face": true,
+  "bust": true
+ },
+ "2": {
+  "name": "Scherazard",
+  "key": "c5002",
+  "model": "chr5002p",
+  "face": true,
+  "bust": true
+ },
+ "3": {
+  "name": "Olivier",
+  "key": "c0003",
+  "model": "chr0003p",
+  "face": true,
+  "bust": true
+ },
+ "4": {
+  "name": "Kloe",
+  "key": "c5004",
+  "model": "chr5004p",
+  "face": true,
+  "bust": true
+ },
+ "5": {
+  "name": "Agate",
+  "key": "c0005",
+  "model": "chr0005p",
+  "face": true,
+  "bust": true
+ },
+ "6": {
+  "name": "Tita",
+  "key": "c5006",
+  "model": "chr5006p",
+  "face": true,
+  "bust": true
+ },
+ "7": {
+  "name": "Zin",
+  "key": "c0007",
+  "model": "chr0007p",
+  "face": true,
+  "bust": true
+ },
+ "100": {
+  "name": "Kurt",
+  "key": "c0100",
+  "model": "chr0100p",
+  "face": true,
+  "bust": true
+ },
+ "101": {
+  "name": "Anelace",
+  "key": "c5101",
+  "model": "chr5101p",
+  "face": true,
+  "bust": true
+ },
+ "104": {
+  "name": "Don",
+  "key": "c0104_c00",
+  "model": "chr0104p",
+  "face": true,
+  "bust": true
+ },
+ "105": {
+  "name": "Kyle",
+  "key": "c0105",
+  "model": "chr0105p",
+  "face": true,
+  "bust": true
+ },
+ "106": {
+  "name": "Josette",
+  "key": "c5106",
+  "model": "chr5106p",
+  "face": true,
+  "bust": true
+ },
+ "107": {
+  "name": "Captain Schwarz",
+  "key": "c5107",
+  "model": "chr5107p",
+  "face": true,
+  "bust": true
+ },
+ "110": {
+  "name": "Butler Phillip",
+  "key": "c0110",
+  "model": "chr0110p",
+  "face": true,
+  "bust": true
+ },
+ "112": {
+  "name": "Mueller",
+  "key": "c0112",
+  "model": "chr0112p",
+  "face": true,
+  "bust": true
+ },
+ "119": {
+  "name": "Kevin",
+  "key": "c0125",
+  "model": "chr0125p",
+  "face": true,
+  "bust": true
+ },
+ "121": {
+  "name": "Duke Dunan",
+  "key": "c0301",
+  "model": "chr0301p",
+  "face": true,
+  "bust": true
+ },
+ "124": {
+  "name": "Dorothy",
+  "key": "c5308",
+  "model": "chr5308p",
+  "face": true,
+  "bust": true
+ },
+ "158": {
+  "name": "Renne",
+  "key": "c5121",
+  "model": "chr5121p",
+  "face": true,
+  "bust": true
+ },
+ "165": {
+  "name": "Estelle",
+  "key": "c5344",
+  "model": "chr5344p",
+  "face": false,
+  "bust": true
+ },
+ "10058": {
+  "name": "Mine Chief Garton",
+  "key": "c0604_c03",
+  "model": "chr0604p",
+  "face": true,
+  "bust": false
+ },
+ "10061": {
+  "name": "Miner Bones",
+  "key": "c0604_c02",
+  "model": "chr0604_c02p",
+  "face": true,
+  "bust": false
+ },
+ "10063": {
+  "name": "Miner Pilm",
+  "key": "c0604_c01",
+  "model": "chr0604_c01p",
+  "face": true,
+  "bust": false
+ },
+ "10064": {
+  "name": "Miner Heine",
+  "key": "c0604_c02_1",
+  "model": "chr0604_c02_1p",
+  "face": true,
+  "bust": false
+ },
+ "10071": {
+  "name": "Milano",
+  "key": "c5513",
+  "model": "chr5513p",
+  "face": true,
+  "bust": false
+ },
+ "11002": {
+  "name": "Jimmy",
+  "key": "c0501",
+  "model": "chr0501p",
+  "face": true,
+  "bust": false
+ },
+ "11081": {
+  "name": "Mick",
+  "key": "c0550_c03",
+  "model": "chr0550_c03p",
+  "face": true,
+  "bust": false
+ }
+}
