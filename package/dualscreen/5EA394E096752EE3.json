@@ -1,0 +1,85 @@
+{
+ "_game": "Trails in the Sky 2nd Chapter",
+ "_build": "1.0.3 (v327680), build 5EA394E096752EE3D04DEBFCEA6BF9114277D0B4",
+ "_layout": "object O = [main+0x879628] (alias region). Character table at O+0x1145A4 + id*0x39C0 = HP; -8 level, -4 EXP, +4 max HP, +8/+0xC EP/max, +0x10/+0x14 CP/max. Mira u32 at O+0x20B648. See design/DATA.md.",
+ "points": {
+  "lv": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x11459c",
+   "count": 4,
+   "stride": 14784
+  },
+  "hp": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145a4",
+   "count": 4,
+   "stride": 14784
+  },
+  "hpmax": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145a8",
+   "count": 4,
+   "stride": 14784
+  },
+  "ep": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145ac",
+   "count": 4,
+   "stride": 14784
+  },
+  "epmax": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145b0",
+   "count": 4,
+   "stride": 14784
+  },
+  "cp": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145b4",
+   "count": 4,
+   "stride": 14784
+  },
+  "cpmax": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x1145b8",
+   "count": 4,
+   "stride": 14784
+  },
+  "mira": {
+   "type": "u32",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x20b648"
+  }
+ }
+}

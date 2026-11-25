@@ -118,6 +118,11 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] Isolated test profile (`~/trails-files/test-profile`, made by
       `tools/reset_test_profile.sh`), so test runs and memory writes never touch the real saves.
       Note the gdbstub listens on all interfaces (0.0.0.0:6543) during test runs.
+      **Fixed 2026-11-25:** the copied config's absolute `nand/sdmc/load/dump_directory` paths
+      kept pointing at the real profile (a portable `./user` doesn't override them), so earlier
+      sessions used the real save folder. The real saves were checked and are byte-identical to
+      the backups (no autosave happened). The reset script now rewrites those paths, and
+      `tools/check_test_profile.sh` refuses to boot unless they're inside the test profile.
 - [x] Install the update into Eden: `eden-cli --install <update.nsp>` (loader then reports
       "Update (v0.5.0) applied", i.e. v327680).
 - [x] Record the **build ID** of the 1.0.3 `main`:
@@ -158,9 +163,15 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [ ] Look into the game's file formats (fonts, text tables, portraits) for later art decoding.
 
 ### Phase 4: Build the package
-- [ ] `package.json`, `manifest.json`, `<BUILD16>.json` (+ module if needed).
-- [ ] Decode art/fonts from the game's own files (no shipped assets), once formats are known.
-- [ ] Build with `tools/build_dualscreen_package.py`.
+- [x] **v0.1.0 (2026-11-25): Party page.** `tools/gen_package.py` writes `package/` (manifest,
+      `5EA394E096752EE3.json`, original artwork from `design/render.py`);
+      `tools/build_package.sh` builds `dist/01007A2027548000.dsmod.zip`. No native module,
+      `min_runtime` 24. Shows level, HP/EP/CP with bars for every joined character, and mira.
+      Tested headless in Eden Duo: loads, values match the game, updates live (HP write showed
+      within a second).
+- [ ] Party order (who is in the active party), then the battle page.
+- [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
+      known. Until then: built-in pixel font, placeholder portraits.
 
 ### Phase 5: Validate
 - [ ] Every value matches the game's own menu (sentinel test: change a value in RAM, check both

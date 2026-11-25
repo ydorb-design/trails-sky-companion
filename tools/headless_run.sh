@@ -26,6 +26,9 @@ if [ ! -d "$PROFILE/user" ]; then
     echo "no test profile at $PROFILE/user; run tools/reset_test_profile.sh first" >&2
     exit 1
 fi
+# A portable ./user does NOT override the absolute storage paths in the config, so check them
+# every time: never boot with saves (nand) in the real profile.
+"$(dirname "$0")/check_test_profile.sh" "$PROFILE"
 
 mkdir -p "$RUN"
 RUN=$(cd "$RUN" && pwd)

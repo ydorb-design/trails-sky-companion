@@ -56,17 +56,27 @@ def lerp(a, b, t):
 
 
 class Page:
-    def __init__(self):
-        self.img = Image.new("RGB", (W, H))
+    def __init__(self, size=(W, H), transparent=False):
+        # transparent=True: an RGBA layer (package art drawn over by the runtime's widgets)
+        self.w, self.h = size
+        self.img = Image.new("RGBA" if transparent else "RGB", size, (0, 0, 0, 0))
         self.d = ImageDraw.Draw(self.img)
-        self.marble()
+        if not transparent:
+            self.marble()
+
+    def over(self, layer):
+        """Blend an RGBA layer onto the page (alpha-composite on transparent pages)."""
+        if self.img.mode == "RGBA":
+            self.img.alpha_composite(layer)
+        else:
+            self.img.paste(layer, (0, 0), layer)
 
     # -- backgrounds and ornaments ----------------------------------------------------------
     def marble(self):
-        for y in range(H):
-            self.d.line((0, y, W, y), fill=lerp(C["marble_hi"], C["marble_lo"], y / H))
+        for y in range(self.h):
+            self.d.line((0, y, self.w, y), fill=lerp(C["marble_hi"], C["marble_lo"], y / self.h))
         # faint clockwork emblem, like the menu background line art
-        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        layer = Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
         ld = ImageDraw.Draw(layer)
         cx, cy = 150, 640
         col = C["ornament"] + (150,)
@@ -79,23 +89,23 @@ class Page:
         cx, cy = 1120, 980
         for r in (260, 200):
             ld.ellipse((cx - r, cy - r, cx + r, cy + r), outline=col, width=5)
-        self.img.paste(layer, (0, 0), layer)
+        self.over(layer)
 
     def shadow(self, box, radius=10, offset=(0, 6), alpha=90, blur=10):
-        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        layer = Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
         x0, y0, x1, y1 = box
         ImageDraw.Draw(layer).rounded_rectangle(
             (x0 + offset[0], y0 + offset[1], x1 + offset[0], y1 + offset[1]),
             radius=radius, fill=(0, 0, 0, alpha))
         layer = layer.filter(ImageFilter.GaussianBlur(blur))
-        self.img.paste(layer, (0, 0), layer)
+        self.over(layer)
 
     def glow(self, box, radius=10):
-        layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        layer = Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
         ImageDraw.Draw(layer).rounded_rectangle(box, radius=radius, outline=C["glow"] + (255,),
                                                 width=8)
         layer = layer.filter(ImageFilter.GaussianBlur(6))
-        self.img.paste(layer, (0, 0), layer)
+        self.over(layer)
         self.d.rounded_rectangle(box, radius=radius, outline=C["glow"], width=3)
 
     # -- panels ---------------------------------------------------------------------------
@@ -170,9 +180,9 @@ class Page:
         """Navy stat box with a slanted right edge, like the camp-menu party boxes."""
         self.shadow((x, y, x + w, y + h), radius=4)
         poly = [(x, y), (x + w, y), (x + w - slant, y + h), (x, y + h)]
-        mask = Image.new("L", (W, H), 0)
+        mask = Image.new("L", (self.w, self.h), 0)
         ImageDraw.Draw(mask).polygon(poly, fill=255)
-        grad = Image.new("RGB", (W, H))
+        grad = Image.new("RGBA", (self.w, self.h))
         gd = ImageDraw.Draw(grad)
         for i in range(h + 1):
             gd.line((x, y + i, x + w, y + i), fill=lerp(C["navy_a"], C["navy_b"], i / h))
