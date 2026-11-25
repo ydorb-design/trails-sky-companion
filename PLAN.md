@@ -59,7 +59,8 @@ dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
 - [x] Own the **Switch 1** version and dump it (NSP + update, `prod.keys`, firmware).
 - [x] Dual-screen handheld: **AYN Thor** (Peanuts Native's own test device).
 - [x] Build and play FF Resonance in Peanuts Native on the Thor.
-- [ ] Dev machine: **native Linux**. Windows isn't a supported dev path: companion modules only
+- [x] Dev machine: **CachyOS** (Arch-based). Install packages with `yay -S <pkg>` (not apt, and
+      never `sudo yay`). Windows isn't a supported dev path: companion modules only
       load as `linux-x86_64` or `android-arm64-v8a`, so a Windows Eden can't run ours, and the
       docs, tools and headless test loop assume Linux. WSL2 can't reliably run the game (GPU).
 - [ ] Claude Code installed on the Linux machine, this repo cloned there.
