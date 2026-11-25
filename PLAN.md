@@ -115,6 +115,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] Keys and firmware 22.1.0 installed in `~/.local/share/eden`.
 - [x] Learn the headless screenshot/input loop (`--aux-virtual`). Done with Trails itself, since
       the existing companions need dumps of their own games: `tools/headless_run.sh`.
+- [x] Isolated test profile (`~/trails-files/test-profile`, made by
+      `tools/reset_test_profile.sh`), so test runs and memory writes never touch the real saves.
+      Note the gdbstub listens on all interfaces (0.0.0.0:6543) during test runs.
 - [x] Install the update into Eden: `eden-cli --install <update.nsp>` (loader then reports
       "Update (v0.5.0) applied", i.e. v327680).
 - [x] Record the **build ID** of the 1.0.3 `main`:
@@ -125,20 +128,31 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       base romfs from the XCI and overlay changed files. Not needed until Phase 3/4.
 
 ### Phase 2: Design (Claude, since 2026-11-25; you review when you have time)
-- [ ] Mockups as images at 1240x1080 in `design/` (instead of Figma), based on screenshots from
-      the desktop test runs. Your review is welcome but doesn't block the next phases.
+- [x] Mockups as images at 1240x1080 in `design/` (instead of Figma), based on screenshots from
+      the desktop test runs: `design/field.png`, `design/battle.png`, drawn by
+      `design/render.py` from the runtime's own primitives (rects, labels, values, bars).
+      First drafts; your review is welcome but doesn't block the next phases.
 - [ ] Pick a v1 scope. Suggested: **Battle panel** (turn order, enemy HP, party HP/EP/CP)
       plus **Party status** outside battle. Map and quests later.
 - [ ] Check what the game's own menus and battle HUD show (screenshots from the Thor) to set
       the design target.
 - [ ] Design pages in Figma at the companion canvas size: **1240x1080**, one layout only
       (unless `canvas_alt` is confirmed in Peanuts).
-- [ ] Map every on-screen value to a data name (e.g. `p0.hp`, `p0.cp`, `turn.0.unit`). This
-      list becomes the reverse-engineering checklist.
+- [x] Map every on-screen value to a data name: `design/DATA.md`, which is also the
+      reverse-engineering checklist and records where each value lives.
 
 ### Phase 3: Find the data (reverse engineering)
 - [ ] Start from public cheats for anchors (HP, mira, party), if any exist for 1.0.3.
-- [ ] Use the live memory console (`findi`, `snap`/`diff`, `ptrto`) to locate values.
+- [x] Locate values. The console's heap scanners don't work for this game: its state lives in
+      the **alias region** (`0x11...`), outside the heap they search. What works: full memory
+      snapshots over the gdbstub (`tools/gdbmem.py snap`, ~3.5 min for 2.6 GB) compared with
+      `tools/memdiff.py`. The test profile has the gdbstub on; with it on, the game waits at
+      boot until a debugger continues it (`tools/gdbmem.py info` does that).
+- [x] **Character table found and verified** (details in `design/DATA.md`):
+      `[main+0x879628] + 0x1145A4 + id*0x39C0` = HP, with level, EXP, max HP, EP, CP nearby.
+      Confirmed on two boots with two saves, sentinel-tested (CP write showed on the HUD).
+- [ ] Next: party order (which ids are in the party), mira, then battle data (enemy HP, and
+      turn order once a command battle can be triggered).
 - [ ] Turn each value into a stable pointer chain; confirm on a second boot.
 - [ ] Decide: plain JSON pointer chains vs a native module (probably needed for battle).
 - [ ] Look into the game's file formats (fonts, text tables, portraits) for later art decoding.
