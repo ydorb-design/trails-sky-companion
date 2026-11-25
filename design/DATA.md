@@ -27,6 +27,19 @@ pointer chain confirmed on a second boot, `checked` passed the sentinel test
 - `main+0x879628` points to a big game-state object in the **alias region** (`0x11...`), not
   the heap. That's why the console's `findi`/`cscan` (heap only, and capped) never found it.
   Found by diffing two full memory snapshots (`tools/gdbmem.py snap` + `tools/memdiff.py`).
+- `object` below means `[main+0x879628]`, the game-state object.
+- **Mira** (2026-11-25): `object+0x20B648`, u32. Found by comparing the object across the
+  battle save (1000) and the town save (0) on different boots (`tools/objdiff.py`), then
+  sentinel-tested: wrote 4321, the camp menu showed MIRA 4321, wrote 0 back.
+- **Party order: not found yet (2026-11-25).** Swapping Estelle and Anelace with Change
+  Formation (D-pad Down in the camp menu, then A, D-pad Right, A, B) changed no neighbouring
+  pair in the object (0..0xC60000) and no field between their two records. Full-snapshot
+  diffs (`tools/swapfind.py`, snapshots F1 = Anelace first, F2 = Estelle first) only found a
+  thread-stack local (`[1,0]`->`[0,1]` in a `Stack` mapping, not durable) and render/UI
+  buffers. Next try: a save with more members than party slots, where "in party" vs "joined"
+  differ.
+- **v1 workaround:** show every character whose record has level > 0 (joined), in table order.
+  Right at this point of the story (Estelle, Anelace); wrong once reserves exist.
 - A second, stale copy of the same records sits about 6.5 MB later (doesn't follow damage);
   probably the loaded save. Don't use it.
 - Checks done (2026-11-25):
@@ -58,7 +71,8 @@ current HP. The bars had a dark tail.
 
 | Name | Meaning | Ref | Status |
 |---|---|---|---|
-| `mira` | money | 1000 (battle save), 0 (town save) | - |
+| `mira` | money: u32 at `object+0x20B648` | 1000 (battle save), 0 (town save) | checked |
+| `playtime` | f64 seconds at `object+0x20B650` (counts up while playing) | ~729 s | found |
 | `brave` | Brave Gauge points (field HUD gear, 0..5) | 5 | - |
 | `area.name` | current area (text id) | Balstar Channel | - |
 | `quest.objective` | objective line under the minimap (text id) | Explore the Balstar Channel | - |

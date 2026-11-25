@@ -12,6 +12,7 @@ usage:
   gdbmem.py mappings                  every mapping (address range, permissions, state)
   gdbmem.py snap <outdir>             dump every readable+writable mapping to <outdir>
   gdbmem.py base <nso>                load address of a module (e.g. the dumped `main`)
+  gdbmem.py objsnap <main> <out> [lo hi]   just the game-state object, for quick diffs
   gdbmem.py read <hexaddr> <len>      hex dump
 
 Snapshots are one raw file per mapping (<start>.bin) plus index.json.
@@ -157,6 +158,18 @@ def main(argv):
                       file=sys.stderr)
                 return 1
             print(f"{hits[0]['start']:#x}")
+        elif op == "objsnap":
+            # objsnap <main_base> <out.bin> [lo hi]: the game-state object window only (~22 MB),
+            # [main+0x879628]+lo .. +hi. Much faster than a full snap for before/after diffs.
+            import struct
+            base = int(argv[2], 16)
+            lo = int(argv[4], 0) if len(argv) > 4 else 0
+            hi = int(argv[5], 0) if len(argv) > 5 else 0xC60000
+            root = struct.unpack("<Q", stub.read(base + 0x879628, 8))[0]
+            data = stub.read(root + lo, hi - lo)
+            with open(argv[3], "wb") as f:
+                f.write(data)
+            print(f"object {root:#x}+{lo:#x}..{hi:#x} -> {argv[3]}")
         elif op == "read":
             addr, n = int(argv[2], 16), int(argv[3], 0)
             data = stub.read(addr, n)
