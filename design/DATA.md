@@ -146,6 +146,17 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
   {descriptor, actor vector, count, capacity}. The scripted slug fight's group count went 4 ->
   3 -> 1 -> 0 as slugs died, but groups mix actor types, so the battle slot array is the
   better source.
+- **Character records** (same 0x1a8-byte record table as the monsters, 2026-11-26 boot): in the
+  game's character-id order: 0 Estelle (`chr5000p`), 1 Joshua, 2 Scherazard, 3 Olivier, 4 Kloe,
+  5 Agate, 6 Tita, 7 Zin, 8 Kevin, 9 Anelace (`chr5101p`), 10 Kurt, 11 Captain Schwarz,
+  12 Mueller, 13 Josette, then guests and NPCs (a second Estelle `chr5344p`, Dorothy, Renne...).
+  So the character table the package reads (`O+0x1145A4 + i*0x39C0`, Anelace at i = 1) is
+  **not** indexed by character id: it is in join or party order. No memory copy stores the
+  stats by character id (Estelle and Anelace are adjacent everywhere). There are three
+  0x39C0-stride copies (HP at 0x118bd645d4, 0x118bf70324, 0x118c3a4814 on that boot; the first
+  is the one at `O+0x1145A4`) and a 0x224-stride one at 0x11436f454c. With a two-member party
+  none of this can say which is the roster and which the active party: needs a save where the
+  party differs from the join order.
 - **Monster table** (parsed, in memory): 0x1a8-byte records. `+0` -> model id, `+0x198` ->
   name, `+0x1a0` -> a Japanese comment. The species key in the spawn table is not stored in
   the record, and no hash tried (crc32/crc32c/fnv/djb2/sdbm/murmur3/xxh32/oaat/md5/sha
