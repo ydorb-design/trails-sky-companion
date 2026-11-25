@@ -81,12 +81,58 @@ current HP. The bars had a dark tail.
 ## Battle (field battle and command battle)
 
 The remake fights first in real time on the field (enemy HP bars over heads, Brave Rush with
-ZR), and can switch to turn-based command battles with a turn order. Enemies, `e` = 0..7.
+ZR). **Y** switches a field fight to a turn-based command battle (from the game's own
+"Preemptive Brave Attack" tutorial; scripted fights may start in command mode directly).
+
+### Battle slot array (found 2026-11-25, boot with main at 0x80552000; second boot pending)
+
+`R = [main+0x879470]`. From `R+0xba0` there is an array of 0x30-byte **battle slots**:
+
+| Slot field | Meaning |
+|---|---|
+| `+0x00` | model/field actor (0 when the slot is empty) |
+| `+0x10` | pointer `S`; `[S+0]` = the **battle unit** `U` (0 when empty) |
+
+Party members fill the first slots (leader first), enemies follow. Party units and enemy units
+are different classes:
+
+- **enemy unit:** `[U+0x1d00]` = its live stats record `st`. `st+0x0` u32 unit id (same as the
+  spawn table's), `st+0x4` level, `st+0x8` EXP reward, **`st+0xc` HP**, `st+0x10` max HP,
+  then EP/max, CP/max, stats: the same layout as the character table from level onwards.
+  `st+0x74` f32 = damage taken this battle. For party units `[U+0x1d00]` is 0, so a
+  "+0x1d00" chain simply fails on party slots.
+- **party unit:** `[U+0x3440]` = that character's record in the character table (level field
+  minus 4, i.e. HP-0xc).
+
+Data-file chain for enemy HP in slot i: `["main+0x879470", {offset 0xbb0, stride 0x30,
+index $i}, "0x0", "0x1d00", "0x0"]`, offset `0xc`. Checked live against the game's target
+panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Frog
+2608/3007, the other frog 904/3007).
+
+### Other battle findings
+
+- **Targeted enemy's name** (cstring): `[[main+0x8791a8]+0x238]+0x720`, the target panel's
+  text ("Sticky Slug", "Ripple Frog"). Same address in both fights of one boot.
+- **Spawn table** at `object+0x260024` (stride 0x2F0, HP-relative like the character table):
+  every monster spawned on the map. `HP-0x3c` (s32) is non-zero for monsters in the current
+  battle (9 in the scripted slug fight, 1 in the frog fight). `HP-0x38` u32 = species key
+  (0xb6f62854 Sticky Slug, 0x0e4a4f31 Ripple Frog; not a crc32/fnv/djb2/murmur3 of any string
+  tried), `HP-0x30` = unit id, `HP-0x5c` = model name ("mon5201"). Its HP is the value at
+  battle start, not live. Dead monsters are removed (the table compacts).
+- **Monster groups:** `[[main+0x879470]+0xb40]+0x60` is a list of 0x20-byte groups
+  {descriptor, actor vector, count, capacity}. The scripted slug fight's group count went 4 ->
+  3 -> 1 -> 0 as slugs died, but groups mix actor types, so the battle slot array is the
+  better source.
+- Enemy names for every slot need the monster table (species key -> name). The game's parsed
+  monster table is in memory ("mon5201 ... Mini Slug / Sticky Slug / Sticky Slug+"), but no
+  pointer from a unit leads to it. Options: decode the table from the romfs, or show only the
+  target's name.
 
 | Name | Meaning | Ref | Status |
 |---|---|---|---|
-| `enemy.count` | enemies alive | 4 at the start of the Balstar fight | - |
-| `e{e}.id` | enemy type (name from the game's text) | - | - |
-| `e{e}.hp` / `e{e}.hp_max` | enemy HP | - | - |
+| `enemy.count` | enemies alive | 4 at the start of the Balstar fight | found (group count) |
+| `e{e}.id` | enemy type (species key) | 0xb6f62854 | found (spawn table) |
+| `e{e}.hp` / `e{e}.hp_max` | enemy HP | 272/1676 | found (slot array, 2 fights) |
+| `target.name` | targeted enemy's name | Ripple Frog | found |
 | `turn.{i}.unit` | command battle: who acts i-th | - | - |
 | `turn.{i}.bonus` | command battle: turn bonus on that slot | - | - |
