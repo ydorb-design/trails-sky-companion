@@ -95,10 +95,15 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 
 ### Phase 1: Dev environment
 - [x] Clone eden-duo and eden-duo-companions (in `~/Projects/eden/`).
-- [ ] Install the missing build libraries:
+- [x] Install the missing build libraries:
       `yay -S --needed boost catch2 enet vulkan-utility-libraries spirv-headers`.
-- [ ] Build `eden-cli` (Linux, `EDEN_DSMOD_BUILD_DEV_TOOLS=ON`) from eden-duo.
-- [ ] Build the companions' native modules project once to prove the toolchain.
+- [ ] Build `eden-cli` (Linux, `EDEN_DSMOD_BUILD_DEV_TOOLS=ON`) from eden-duo. Configure with
+      `-DENABLE_QT=OFF -DYUZU_TESTS=OFF -Dzstd_FORCE_BUNDLED=ON -Dlz4_FORCE_BUNDLED=ON
+      -DVulkanHeaders_FORCE_BUNDLED=ON`: the companions modules project compiles zstd and lz4
+      from eden-duo's `.cache/cpm`, which stays empty when the system copies are used.
+- [x] Build the companions' native modules project once to prove the toolchain (dq3 and
+      wonder built, in `~/Projects/eden/build-mods`).
+- [x] Keys and firmware 22.1.0 installed in `~/.local/share/eden`.
 - [ ] Run an existing companion headless (`--aux-virtual`) to learn the screenshot/input loop.
 - [ ] Dump romfs/exefs of Trails (`eden-cli --dump-romfs`), record the **build ID** of the
       1.0.3 build (base + update, not the base NSO).
