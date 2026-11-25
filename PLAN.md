@@ -92,7 +92,10 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] First save, made on the desktop in Eden instead of the Thor (same build): after the
       opening cutscenes, Estelle alone in the field, objective "Look for Cassius". Backed up to
       `~/trails-files/saves/2026-11-25-after-opening/` (slots `save000`, `save015`).
-- [ ] More saves: just before the first battle, and in a town.
+- [x] More saves, backed up to `~/trails-files/saves/2026-11-25-battle-and-town/`:
+      `save002` Balstar Channel dungeon, Estelle + Anelace Lv.25 (**battle save**);
+      `save001` City of Rolent (**town save**); `save015` is the autosave. On the Load screen
+      (Title > Load Game) slots are listed autosave first, then newest first.
 - [x] Confirm the game also boots in Eden Duo on the desktop: reaches the title screen
       (Ver.1.03) with the update applied, menu input works (2026-11-25).
 
@@ -121,7 +124,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       delta), so take files from the running game with `EDEN_DSMOD_DUMP_ROMFS`, or dump the
       base romfs from the XCI and overlay changed files. Not needed until Phase 3/4.
 
-### Phase 2: Design (your strength)
+### Phase 2: Design (Claude, since 2026-11-25; you review when you have time)
+- [ ] Mockups as images at 1240x1080 in `design/` (instead of Figma), based on screenshots from
+      the desktop test runs. Your review is welcome but doesn't block the next phases.
 - [ ] Pick a v1 scope. Suggested: **Battle panel** (turn order, enemy HP, party HP/EP/CP)
       plus **Party status** outside battle. Map and quests later.
 - [ ] Check what the game's own menus and battle HUD show (screenshots from the Thor) to set
