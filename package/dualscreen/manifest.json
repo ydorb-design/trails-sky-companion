@@ -22,6 +22,38 @@
      "src": "file:img/bg_party.png"
     },
     {
+     "type": "button",
+     "rect": [
+      760,
+      22,
+      210,
+      52
+     ],
+     "text": "Party",
+     "text_scale": 3,
+     "align": "center",
+     "pill": true,
+     "on_tap": "go_party",
+     "color": "#FFFFFFFF",
+     "bg": "#FF2B4253"
+    },
+    {
+     "type": "button",
+     "rect": [
+      990,
+      22,
+      210,
+      52
+     ],
+     "text": "Battle",
+     "text_scale": 3,
+     "align": "center",
+     "pill": true,
+     "on_tap": "go_battle",
+     "color": "#FF282420",
+     "bg": "#C8E2E0D7"
+    },
+    {
      "type": "value",
      "rect": [
       1180,
@@ -34,6 +66,20 @@
      "text_scale": 5,
      "italic": true,
      "color": "#FF282420"
+    },
+    {
+     "type": "value",
+     "rect": [
+      480,
+      165,
+      0,
+      0
+     ],
+     "bind": "brave",
+     "align": "center",
+     "text_scale": 4,
+     "italic": true,
+     "color": "#FFFFFFFF"
     },
     {
      "type": "image",
@@ -596,6 +642,664 @@
      "need_bind": "lv3"
     }
    ]
+  },
+  {
+   "id": "battle",
+   "widgets": [
+    {
+     "type": "image",
+     "rect": [
+      0,
+      0,
+      1240,
+      1080
+     ],
+     "src": "file:img/bg_battle.png"
+    },
+    {
+     "type": "button",
+     "rect": [
+      760,
+      22,
+      210,
+      52
+     ],
+     "text": "Party",
+     "text_scale": 3,
+     "align": "center",
+     "pill": true,
+     "on_tap": "go_party",
+     "color": "#FF282420",
+     "bg": "#C8E2E0D7"
+    },
+    {
+     "type": "button",
+     "rect": [
+      990,
+      22,
+      210,
+      52
+     ],
+     "text": "Battle",
+     "text_scale": 3,
+     "align": "center",
+     "pill": true,
+     "on_tap": "go_battle",
+     "color": "#FFFFFFFF",
+     "bg": "#FF2B4253"
+    },
+    {
+     "type": "value",
+     "rect": [
+      1150,
+      400,
+      0,
+      0
+     ],
+     "bind": "brave",
+     "align": "center",
+     "text_scale": 4,
+     "italic": true,
+     "color": "#FFFFFFFF"
+    },
+    {
+     "type": "label",
+     "rect": [
+      848,
+      230,
+      0,
+      0
+     ],
+     "bind_text": "target_name",
+     "text_scale": 4,
+     "color": "#FFFFFFFF",
+     "wrap_width": 340,
+     "max_lines": 2
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      30,
+      120,
+      768,
+      92
+     ],
+     "src": "file:img/enemy_row.png"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "label",
+     "rect": [
+      72,
+      136,
+      0,
+      0
+     ],
+     "text": "Lv",
+     "text_scale": 3,
+     "color": "#FFFFFFFF"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "value",
+     "rect": [
+      122,
+      136,
+      0,
+      0
+     ],
+     "bind": "elv{i}",
+     "text_scale": 3,
+     "color": "#FFFFFFFF"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "value",
+     "rect": [
+      768,
+      130,
+      0,
+      0
+     ],
+     "bind": "ehp{i}",
+     "max_bind": "ehpmax{i}",
+     "max_sep": " / ",
+     "align": "right",
+     "text_scale": 4,
+     "italic": true,
+     "color": "#FF282420"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "bar",
+     "rect": [
+      56,
+      178,
+      712,
+      14
+     ],
+     "bind": "ehp{i}",
+     "max_bind": "ehpmax{i}",
+     "color": "#FFF05A46",
+     "bg": "#FF0E1A22",
+     "frame": 0
+    },
+    {
+     "type": "image",
+     "rect": [
+      40,
+      806,
+      1180,
+      66
+     ],
+     "src": "file:img/party_row.png",
+     "need_bind": "lv0"
+    },
+    {
+     "type": "label",
+     "rect": [
+      70,
+      826,
+      0,
+      0
+     ],
+     "text": "Estelle",
+     "text_scale": 3,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv0"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      260,
+      850,
+      340,
+      8
+     ],
+     "bind": "hp0",
+     "max_bind": "hpmax0",
+     "color": "#FFFF9931",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv0"
+    },
+    {
+     "type": "value",
+     "rect": [
+      600,
+      814,
+      0,
+      0
+     ],
+     "bind": "hp0",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv0"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      690,
+      850,
+      150,
+      8
+     ],
+     "bind": "ep0",
+     "max_bind": "epmax0",
+     "color": "#FF96D7F0",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv0"
+    },
+    {
+     "type": "value",
+     "rect": [
+      840,
+      814,
+      0,
+      0
+     ],
+     "bind": "ep0",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv0"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      930,
+      850,
+      200,
+      8
+     ],
+     "bind": "cp0",
+     "max_bind": "cpmax0",
+     "color": "#FFCEFF84",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv0"
+    },
+    {
+     "type": "value",
+     "rect": [
+      1130,
+      814,
+      0,
+      0
+     ],
+     "bind": "cp0",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv0"
+    },
+    {
+     "type": "image",
+     "rect": [
+      40,
+      874,
+      1180,
+      66
+     ],
+     "src": "file:img/party_row.png",
+     "need_bind": "lv1"
+    },
+    {
+     "type": "label",
+     "rect": [
+      70,
+      894,
+      0,
+      0
+     ],
+     "text": "Anelace",
+     "text_scale": 3,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv1"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      260,
+      918,
+      340,
+      8
+     ],
+     "bind": "hp1",
+     "max_bind": "hpmax1",
+     "color": "#FFFF9931",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv1"
+    },
+    {
+     "type": "value",
+     "rect": [
+      600,
+      882,
+      0,
+      0
+     ],
+     "bind": "hp1",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv1"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      690,
+      918,
+      150,
+      8
+     ],
+     "bind": "ep1",
+     "max_bind": "epmax1",
+     "color": "#FF96D7F0",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv1"
+    },
+    {
+     "type": "value",
+     "rect": [
+      840,
+      882,
+      0,
+      0
+     ],
+     "bind": "ep1",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv1"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      930,
+      918,
+      200,
+      8
+     ],
+     "bind": "cp1",
+     "max_bind": "cpmax1",
+     "color": "#FFCEFF84",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv1"
+    },
+    {
+     "type": "value",
+     "rect": [
+      1130,
+      882,
+      0,
+      0
+     ],
+     "bind": "cp1",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv1"
+    },
+    {
+     "type": "image",
+     "rect": [
+      40,
+      942,
+      1180,
+      66
+     ],
+     "src": "file:img/party_row.png",
+     "need_bind": "lv2"
+    },
+    {
+     "type": "label",
+     "rect": [
+      70,
+      962,
+      0,
+      0
+     ],
+     "text": "Member 3",
+     "text_scale": 3,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv2"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      260,
+      986,
+      340,
+      8
+     ],
+     "bind": "hp2",
+     "max_bind": "hpmax2",
+     "color": "#FFFF9931",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv2"
+    },
+    {
+     "type": "value",
+     "rect": [
+      600,
+      950,
+      0,
+      0
+     ],
+     "bind": "hp2",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv2"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      690,
+      986,
+      150,
+      8
+     ],
+     "bind": "ep2",
+     "max_bind": "epmax2",
+     "color": "#FF96D7F0",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv2"
+    },
+    {
+     "type": "value",
+     "rect": [
+      840,
+      950,
+      0,
+      0
+     ],
+     "bind": "ep2",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv2"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      930,
+      986,
+      200,
+      8
+     ],
+     "bind": "cp2",
+     "max_bind": "cpmax2",
+     "color": "#FFCEFF84",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv2"
+    },
+    {
+     "type": "value",
+     "rect": [
+      1130,
+      950,
+      0,
+      0
+     ],
+     "bind": "cp2",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv2"
+    },
+    {
+     "type": "image",
+     "rect": [
+      40,
+      1010,
+      1180,
+      66
+     ],
+     "src": "file:img/party_row.png",
+     "need_bind": "lv3"
+    },
+    {
+     "type": "label",
+     "rect": [
+      70,
+      1030,
+      0,
+      0
+     ],
+     "text": "Member 4",
+     "text_scale": 3,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv3"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      260,
+      1054,
+      340,
+      8
+     ],
+     "bind": "hp3",
+     "max_bind": "hpmax3",
+     "color": "#FFFF9931",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv3"
+    },
+    {
+     "type": "value",
+     "rect": [
+      600,
+      1018,
+      0,
+      0
+     ],
+     "bind": "hp3",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFFFFFFF",
+     "need_bind": "lv3"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      690,
+      1054,
+      150,
+      8
+     ],
+     "bind": "ep3",
+     "max_bind": "epmax3",
+     "color": "#FF96D7F0",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv3"
+    },
+    {
+     "type": "value",
+     "rect": [
+      840,
+      1018,
+      0,
+      0
+     ],
+     "bind": "ep3",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv3"
+    },
+    {
+     "type": "bar",
+     "rect": [
+      930,
+      1054,
+      200,
+      8
+     ],
+     "bind": "cp3",
+     "max_bind": "cpmax3",
+     "color": "#FFCEFF84",
+     "bg": "#FF0E1A22",
+     "frame": 0,
+     "need_bind": "lv3"
+    },
+    {
+     "type": "value",
+     "rect": [
+      1130,
+      1018,
+      0,
+      0
+     ],
+     "bind": "cp3",
+     "align": "right",
+     "text_scale": 3,
+     "italic": true,
+     "color": "#FFF9FF5B",
+     "need_bind": "lv3"
+    }
+   ]
+  }
+ ],
+ "actions": {
+  "go_party": {
+   "kind": "page",
+   "page": "party",
+   "transition": "fade",
+   "duration_ms": 150
+  },
+  "go_battle": {
+   "kind": "page",
+   "page": "battle",
+   "transition": "fade",
+   "duration_ms": 150
+  }
+ },
+ "derived": [
+  {
+   "name": "in_battle",
+   "cmp": "ne",
+   "a": "bunit0",
+   "b": 0
+  }
+ ],
+ "page_binds": [
+  {
+   "point": "in_battle",
+   "equals": 1,
+   "when_equal": {
+    "page": "battle",
+    "transition": "fade",
+    "duration_ms": 200
+   },
+   "when_not_equal": {
+    "page": "party",
+    "transition": "fade",
+    "duration_ms": 200
+   }
   }
  ]
 }
