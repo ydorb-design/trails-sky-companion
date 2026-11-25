@@ -182,6 +182,13 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] **v0.3.0 (2026-11-26): Enemy names.** Each enemy row shows the monster's name next to its
       level. The target panel was checked on screen ("Sticky Slug"). Tested headless on two
       boots.
+- [x] **v0.4.0 (2026-11-26): The game's own pictures.** Romfs dumped with
+      `eden-cli --dump-romfs` (hactool can't read this game's compressed NCAs). Textures are raw
+      NVN XTX (`asset/nx/image`), which the runtime decodes from `romfs:` at run time, so
+      nothing is shipped. Party page: busts (`avfc<id>`); battle page: AT-bar faces for the
+      party (`at_c<id>`) and every enemy's AT icon via `sprite_map` keyed by the record's icon
+      key (457 keys, `design/at_icon_keys.txt`). Tested headless. Whether Peanuts' runtime 24
+      decodes plain `romfs:` XTX is untested; if it doesn't, the pictures are just missing.
 - [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.

@@ -111,7 +111,8 @@ are different classes:
 - **any unit (party or enemy):** `[U+0x1b0]` = its static record: the monster table record
   for an enemy, the character record for a party member. `[record+0x198]` -> **display name**
   ("Sticky Slug", "Ripple Frog", "Estelle", "Anelace"); `[record+0]` -> model id ("mon5201",
-  "mon5200"). Checked on two boots (frog fight 0x80552000, slug fight 0x80c67000) and shown
+  "mon5200"); `[record+0x20]` -> face model ("chr5000_face"); `[record+0x40]` -> **AT-bar icon
+  key** ("c5000", "c5101", "m5201"; the picture is `romfs:/asset/nx/image/at_<key>.xtx`). Checked on two boots (frog fight 0x80552000, slug fight 0x80c67000) and shown
   live by the companion on the second.
 
 **In a command battle or not:** slot 0's unit `[[R+0xbb0]+0]` is non-zero only during a
@@ -184,3 +185,28 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
   the pre-fight state; the Load list's 2nd entry is then the pre-slug battle save again.
 - Field positions: the leader's recent positions are a ring of xyz floats at
   `object+0x20b6a0` (newest = last changed entry); scratch navigation tools used it.
+
+## Game files (romfs, base game 1.0.0; dumped 2026-11-26)
+
+Dump: `eden-cli --dump-romfs <out> <xci>` run from the test profile (28 GB, in
+`~/trails-files/romfs-base`, not in the repo). Top level: `asset/` (`common/model` .mdl,
+`common/model_info` .mi, `nx/image` textures, `nx/shader`), `asset_<lang>/nx/image` (localised
+textures), `table_<lang>/` (.tbl data tables), `script_<lang>/`, `scene/`, `layout/` (.lay),
+`vfx/`, `bgm*`/`se`/`voice*` (.nxopus), `system`/`system_nx`, `movie*`.
+
+Textures are raw NVN XTX (`DFvN` magic, no outer compression); the runtime's `romfs:` source
+decodes them (`imgdump` in the console converts one to PNG). Useful pictures, by character id
+(the record's `c<id>` key: Estelle 5000, Joshua 0001, Scherazard 5002, Olivier 0003, Kloe 5004,
+Agate 0005, Tita 5006, Zin 0007, Kevin 0125, Anelace 5101, ...):
+
+| File | Size | What |
+|---|---|---|
+| `avfc<id>.xtx` | 256x256 | bust on transparent background (Party page portraits) |
+| `at_c<id>.xtx` | 128x64 | AT-bar face (battle party strip) |
+| `at_m<id>[_b\|_c00].xtx` | 128x64 | a monster's AT-bar icon (enemy rows); key = record+0x40 |
+| `fc_c<id>.xtx` | 512x256 | atlas: round HUD icon, cut-in eyes, small/medium heads |
+| `fc_chr<id>e00_a.xtx` | 512x512 | 3D face model texture (eyes), not a portrait |
+| `btlface0_c<id>.xtx` | 256x256 | battle cut-in face (only 2 exist) |
+
+Fonts: `asset/common/font/font_0.fnt` is the game font (own format; would need a module);
+`dev_font.otf` / `dev_icon.ttf` are developer fonts.

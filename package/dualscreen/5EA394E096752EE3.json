@@ -163,6 +163,22 @@
     "0x0"
    ]
   },
+  "uicon": {
+   "type": "cstring",
+   "count": 12,
+   "offset": "0x40",
+   "ptr": [
+    "main+0x879470",
+    {
+     "offset": "0xbb0",
+     "stride": "0x30",
+     "index": "$i"
+    },
+    "0x0",
+    "0x1b0",
+    "0x0"
+   ]
+  },
   "target_name": {
    "type": "cstring",
    "ptr": [

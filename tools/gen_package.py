@@ -8,9 +8,10 @@ Then build the installable zip with eden-duo-companions' tools/build_dualscreen_
 
 v1 shows one page, "Party": every character whose record has a level (joined), in character
 table order, with level, HP, EP and CP, plus mira. Data locations are documented in
-design/DATA.md. The static art (background, card frames, gear badges, placeholder portraits)
-is original artwork drawn by design/render.py, not game assets; the game's own portraits and
-font come later.
+design/DATA.md. The static art (background, card frames, gear badges, portrait rings) is
+original artwork drawn by design/render.py. The game's own pictures (busts, AT-bar icons) are
+not shipped: the manifest names them as romfs: sources, read from the player's own game files
+at run time (decoded from raw NVN XTX by the runtime).
 """
 import json
 import os
@@ -24,7 +25,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.3.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.4.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -36,6 +37,14 @@ CHAR_STRIDE = 0x39C0
 SLOTS = 4                              # first four table entries (v1: joined = level > 0)
 NAMES = ["Estelle", "Anelace", "Member 3", "Member 4"]   # ids 2+ not identified yet
 COLOURS = ["estelle", "anelace", "enemy", "enemy"]
+# The game's own pictures, read from the player's romfs at run time (nothing is shipped):
+# character id per table entry (None = not identified yet). avfc<id> is a 256x256 bust,
+# at_c<id> the 128x64 AT-bar face.
+CHAR_IDS = ["5000", "5101", None, None]
+ROMFS_IMG = "romfs:/asset/nx/image/"
+# Every AT-bar icon key in the game (file names only, from the base romfs: at_<key>.xtx). A
+# unit record's +0x40 names its key ("c5000", "m5201", "m5201_b").
+AT_KEYS = [k for k in open(os.path.join(ROOT, "design", "at_icon_keys.txt")).read().split()]
 
 # Battle slot array: [main+0x879470] + 0xba0 + slot*0x30 (see design/DATA.md). Party units fill
 # the first slots and their +0x1d00 is 0, so an enemy chain through +0x1d00 fails (hides) there.
@@ -52,7 +61,7 @@ TARGET_OFF = "0xfd68"
 # pointer is at +0x198. (A party actor's +0x3440 link to its character-table entry is NOT
 # usable: one boot showed it pointing back at the actor itself, so the party strip still uses
 # the character table in table order; see design/DATA.md.)
-UNIT_REC, REC_NAME = "0x1b0", 0x198
+UNIT_REC, REC_NAME, REC_ICON = "0x1b0", 0x198, 0x40
 
 # Layout (canvas 1240x1080), same as design/field.png
 CARD_W, CARD_H = 560, 350
@@ -118,6 +127,8 @@ def data_file():
             "ehpmax": enemy(0x10),
             # per slot: display name (enemy or party member)
             "uname": unit(UNIT_REC, "0x0", off=REC_NAME, typ="cstring"),
+            # per slot: AT-bar icon key ("m5201"), mapped to a picture by sprite_map
+            "uicon": unit(UNIT_REC, "0x0", off=REC_ICON, typ="cstring"),
             "target_name": {"type": "cstring", "ptr": TARGET_PTR, "offset": TARGET_OFF},
         },
     }
@@ -163,21 +174,22 @@ def art():
     # enemy row: cream panel with an empty nameplate (name and level drawn by the runtime)
     p = Page((ROW_W + 8, ROW_H + 8), transparent=True)
     p.cream_panel(2, 2, ROW_W, ROW_H)
-    p.header_bar(16, 10, 400, "", h=34, size=22)
+    p.header_bar(136, 10, 400, "", h=34, size=22)
     p.img.save(os.path.join(IMG, "enemy_row.png"))
 
     # party strip row (battle page): navy box, HP/EP/CP labels
     p = Page((1180, 66), transparent=True)
     p.navy_box(0, 2, 1170, 62, slant=18)
-    for x, label in ((210, "HP"), (640, "EP"), (880, "CP")):
+    for x, label in ((290, "HP"), (660, "EP"), (890, "CP")):
         p.d.text((x, 33), label, font=font("bold", 24), fill=(240, 244, 248), anchor="lm",
                  stroke_width=2, stroke_fill=C["num_outline"])
     p.img.save(os.path.join(IMG, "party_row.png"))
 
-    # placeholder portraits (the game's own portraits come later)
+    # portraits: a plain ring for members whose bust comes from the game, a lettered
+    # placeholder for the ones not identified yet
     for i in range(SLOTS):
         p = Page((200, 200), transparent=True)
-        p.portrait(100, 100, 92, COLOURS[i], NAMES[i][0])
+        p.portrait(100, 100, 92, COLOURS[i], "" if CHAR_IDS[i] else NAMES[i][0])
         p.img.save(os.path.join(IMG, f"portrait_{i}.png"))
 
 
@@ -212,6 +224,10 @@ def party_page():
         show = f"lv{i}"
         w.append({"type": "image", "rect": [x + CARD_W // 2 - 100, y - 4, 200, 200],
                   "src": f"file:img/portrait_{i}.png", "need_bind": show})
+        if CHAR_IDS[i]:
+            # the game's bust (drawn under the card, which covers the shoulders)
+            w.append({"type": "image", "rect": [x + CARD_W // 2 - 115, y - 62, 230, 230],
+                      "src": f"{ROMFS_IMG}avfc{CHAR_IDS[i]}.xtx", "need_bind": show})
         w.append({"type": "image", "rect": [x, y, CARD_W + 20, CARD_H + 30],
                   "src": "file:img/card.png", "need_bind": show})
         w.append({"type": "value", "rect": [x + 30, y + 166, 0, 0], "bind": f"lv{i}",
@@ -246,16 +262,17 @@ def battle_page():
     x0, y0 = 32, ROW_Y
     w.append(dict(rep, type="image", rect=[x0 - 2, y0 - 2, ROW_W + 8, ROW_H + 8],
                   src="file:img/enemy_row.png"))
-    w.append(dict(rep, type="label", rect=[x0 + 36, y0 + 14, 0, 0], bind_text="uname{i}",
-                  text_scale=3, color=rgba("num_white"), wrap_width=290, max_lines=1))
-    w.append(dict(rep, type="label", rect=[x0 + 336, y0 + 14, 0, 0], text="Lv",
+    w.append(dict(rep, type="image", rect=[x0 + 12, y0 + 12, 112, 56], src_bind="uicon{i}"))
+    w.append(dict(rep, type="label", rect=[x0 + 156, y0 + 14, 0, 0], bind_text="uname{i}",
+                  text_scale=3, color=rgba("num_white"), wrap_width=270, max_lines=1))
+    w.append(dict(rep, type="label", rect=[x0 + 446, y0 + 14, 0, 0], text="Lv",
                   text_scale=3, color=rgba("num_white")))
-    w.append(dict(rep, type="value", rect=[x0 + 376, y0 + 14, 0, 0], bind="elv{i}",
+    w.append(dict(rep, type="value", rect=[x0 + 486, y0 + 14, 0, 0], bind="elv{i}",
                   text_scale=3, color=rgba("num_white")))
     w.append(dict(rep, type="value", rect=[x0 + ROW_W - 24, y0 + 8, 0, 0], bind="ehp{i}",
                   max_bind="ehpmax{i}", max_sep=" / ", align="right", text_scale=4,
                   italic=True, color=rgba("ink")))
-    w.append(dict(rep, type="bar", rect=[x0 + 24, y0 + 56, ROW_W - 48, 14], bind="ehp{i}",
+    w.append(dict(rep, type="bar", rect=[x0 + 136, y0 + 56, ROW_W - 160, 14], bind="ehp{i}",
                   max_bind="ehpmax{i}", color=rgba("en_b"), bg=rgba("track"), frame=0))
     # party strip (character table, same rule as the party page: joined = level > 0)
     for i in range(SLOTS):
@@ -263,11 +280,15 @@ def battle_page():
         show = f"lv{i}"
         w.append({"type": "image", "rect": [40, y, 1180, 66], "src": "file:img/party_row.png",
                   "need_bind": show})
-        w.append({"type": "label", "rect": [70, y + 20, 0, 0], "text": NAMES[i],
-                  "text_scale": 3, "color": rgba("num_white"), "need_bind": show})
-        for key, x, wbar, col, ncol in (("hp", 260, 340, "hp_b", "num_white"),
-                                        ("ep", 690, 150, "ep_b", "num_yellow"),
-                                        ("cp", 930, 200, "cp_b", "num_yellow")):
+        if CHAR_IDS[i]:
+            w.append({"type": "image", "rect": [52, y + 5, 112, 56],
+                      "src": f"{ROMFS_IMG}at_c{CHAR_IDS[i]}.xtx", "need_bind": show})
+        w.append({"type": "label", "rect": [172, y + 20, 0, 0], "text": NAMES[i],
+                  "text_scale": 3, "color": rgba("num_white"), "need_bind": show,
+                  "wrap_width": 110, "max_lines": 1})
+        for key, x, wbar, col, ncol in (("hp", 340, 280, "hp_b", "num_white"),
+                                        ("ep", 710, 140, "ep_b", "num_yellow"),
+                                        ("cp", 940, 190, "cp_b", "num_yellow")):
             w.append({"type": "bar", "rect": [x, y + 44, wbar, 8], "bind": f"{key}{i}",
                       "max_bind": f"{key}max{i}", "color": rgba(col), "bg": rgba("track"),
                       "frame": 0, "need_bind": show})
@@ -288,6 +309,8 @@ def manifest():
         "background": rgba("marble_lo"),
         "_note": "Generated by tools/gen_package.py; edit that, not this file.",
         "pages": [party_page(), battle_page()],
+        # AT-bar icon key (a unit record's +0x40) -> the game's own picture
+        "sprite_map": {k: f"{ROMFS_IMG}at_{k}.xtx" for k in AT_KEYS},
         "actions": {
             "go_party": {"kind": "page", "page": "party", "transition": "fade",
                          "duration_ms": 150},
