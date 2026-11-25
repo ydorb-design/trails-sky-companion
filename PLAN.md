@@ -49,7 +49,9 @@ dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
   closest templates for party, battle, map and font decoding.
 - Turn-based with weakness/stagger: a battle panel (enemy HP, weaknesses, stagger, party
   status) is a natural fit for a second screen.
-- Assumption to confirm: it is Unreal Engine like the other HD-2D titles.
+- **Map**: Octopath 0's module already reads Unreal `.pak` files, decodes map art from the
+  player's own files and draws a pannable map with markers (`ot0_pak`, `ot0_map_assets`,
+  `ot0_minimap`). Our starting point for a map page.
 
 ## Phases
 
@@ -57,7 +59,9 @@ dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
 - [x] Own the **Switch 1** version and dump it (NSP + update, `prod.keys`, firmware).
 - [x] Dual-screen handheld: **AYN Thor** (Peanuts Native's own test device).
 - [x] Build and play FF Resonance in Peanuts Native on the Thor.
-- [ ] Dev machine: **native Linux** (the Eden Duo docs and tools are written for it).
+- [ ] Dev machine: **native Linux**. Windows isn't a supported dev path: companion modules only
+      load as `linux-x86_64` or `android-arm64-v8a`, so a Windows Eden can't run ours, and the
+      docs, tools and headless test loop assume Linux. WSL2 can't reliably run the game (GPU).
 - [ ] Claude Code installed on the Linux machine, this repo cloned there.
 - [ ] Copy the NSP, update, `prod.keys` and firmware to `~/ffres-files/` (outside the repo,
       never committed).
@@ -70,9 +74,15 @@ dev notes (PEANUTS.md, Nov 2026), it differs in ways that constrain our design:
 - [ ] Dump romfs/exefs of FF Resonance, record the **title ID** and **build ID**.
 
 ### Phase 2: Design (your strength)
-- [ ] Pick a v1 scope. Suggested: **Party status** + **Battle panel**. Map and items later.
-- [ ] Design pages in Figma at the companion canvas size (1240x1080, plus a narrow
-      `canvas_alt` layout if we want phone/foldable support).
+- [ ] Pick a v1 scope. Headline feature: **Map**. Plus Party status and a Battle panel.
+- [ ] Map, built in stages, each one shippable:
+      1. Area name + party summary (memory reads only, proves the pipeline).
+      2. Static map of the current area, decoded from the game's own files.
+      3. Live player position marker (needs world-to-map coordinates).
+      4. Extras if the data exists: points of interest, chests, exits, fog of war.
+- [ ] Check what the game's own map shows (screenshots from the Thor) to set the design target.
+- [ ] Design pages in Figma at the companion canvas size: **1240x1080**, one layout only
+      (Peanuts' runtime 24 has no `canvas_alt`).
 - [ ] Map every on-screen value to a data name (e.g. `p0.hp`, `e1.weak.fire`). This list
       becomes the reverse-engineering checklist.
 
