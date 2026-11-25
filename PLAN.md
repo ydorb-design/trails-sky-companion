@@ -87,26 +87,36 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] `prod.keys`, `title.keys` and firmware 22.1.0 in `~/trails-files/` (outside the repo,
       never committed).
 - [x] Update 1.0.3 in `~/trails-files/update/v-trails_in_the_sky_2nd_chapter_v327680.nsp`.
-- [ ] Base game dump `~/trails-files/Trails in the Sky 2nd Chapter.xci` (still copying as
-      `.xci.part` on 2026-11-25).
+- [x] Base game dump `~/trails-files/Trails in the Sky 2nd Chapter.xci`.
 - [ ] Build and play it in Peanuts Native on the Thor; start a new game (see Save data).
 - [ ] Copy the Thor save to the desktop.
-- [ ] Confirm the game also boots in Eden Duo on the desktop (needed for the dev tools).
+- [x] Confirm the game also boots in Eden Duo on the desktop: reaches the title screen
+      (Ver.1.03) with the update applied, menu input works (2026-11-25).
 
 ### Phase 1: Dev environment
 - [x] Clone eden-duo and eden-duo-companions (in `~/Projects/eden/`).
 - [x] Install the missing build libraries:
       `yay -S --needed boost catch2 enet vulkan-utility-libraries spirv-headers`.
-- [ ] Build `eden-cli` (Linux, `EDEN_DSMOD_BUILD_DEV_TOOLS=ON`) from eden-duo. Configure with
+- [x] Build `eden-cli` (Linux, `EDEN_DSMOD_BUILD_DEV_TOOLS=ON`) from eden-duo. Configure with
       `-DENABLE_QT=OFF -DYUZU_TESTS=OFF -Dzstd_FORCE_BUNDLED=ON -Dlz4_FORCE_BUNDLED=ON
       -DVulkanHeaders_FORCE_BUNDLED=ON`: the companions modules project compiles zstd and lz4
       from eden-duo's `.cache/cpm`, which stays empty when the system copies are used.
+      **Local patch needed with GCC:** `src/core/mods/mod_actions.cpp:300` declares `pad` but
+      never uses it, which fails under `-Werror`; marked `[[maybe_unused]]` (eden-duo
+      `ba7c910`). Reapply after updating eden-duo; worth reporting upstream.
 - [x] Build the companions' native modules project once to prove the toolchain (dq3 and
       wonder built, in `~/Projects/eden/build-mods`).
 - [x] Keys and firmware 22.1.0 installed in `~/.local/share/eden`.
-- [ ] Run an existing companion headless (`--aux-virtual`) to learn the screenshot/input loop.
-- [ ] Dump romfs/exefs of Trails (`eden-cli --dump-romfs`), record the **build ID** of the
-      1.0.3 build (base + update, not the base NSO).
+- [x] Learn the headless screenshot/input loop (`--aux-virtual`). Done with Trails itself, since
+      the existing companions need dumps of their own games: `tools/headless_run.sh`.
+- [x] Install the update into Eden: `eden-cli --install <update.nsp>` (loader then reports
+      "Update (v0.5.0) applied", i.e. v327680).
+- [x] Record the **build ID** of the 1.0.3 `main`:
+      `5EA394E096752EE3D04DEBFCEA6BF9114277D0B4`, so the data file is
+      **`5EA394E096752EE3.json`**. Confirmed at runtime. Exefs is in `~/trails-files/dump/update/`.
+- [ ] Dump the romfs. The update NSP alone gives a mostly empty 25 GB tree (an update is only a
+      delta), so take files from the running game with `EDEN_DSMOD_DUMP_ROMFS`, or dump the
+      base romfs from the XCI and overlay changed files. Not needed until Phase 3/4.
 
 ### Phase 2: Design (your strength)
 - [ ] Pick a v1 scope. Suggested: **Battle panel** (turn order, enemy HP, party HP/EP/CP)
