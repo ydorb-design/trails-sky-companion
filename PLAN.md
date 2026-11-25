@@ -161,8 +161,10 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       slot array under `[main+0x879470]` gives every enemy's level and live HP (chain checked
       on four boots, companion followed a test write); slot 0 being filled marks a command
       battle; Brave Gauge and the targeted enemy's name found too. Details in `design/DATA.md`.
-- [ ] Still open: party order, turn order, enemy names for every slot (needs the monster table
-      from the romfs; only the targeted enemy's name is available now).
+- [x] **Enemy names (2026-11-26):** every battle unit points at its static record
+      (`[unit+0x1b0]`, name pointer at `+0x198`), so no romfs decoding is needed.
+- [ ] Still open: party order (needs a save with a different party), turn order (ruled out so
+      far: unit-pointer lists, slot-index arrays, a render list; see `design/DATA.md`).
 - [x] Plain JSON pointer chains are enough so far; no native module needed.
 - [ ] Look into the game's file formats (fonts, text tables, portraits) for later art decoding.
 
@@ -177,6 +179,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       empty slots leave no gap), target name, Brave Gauge, party strip; Brave Gauge also on the
       Party page; Party/Battle tabs; switches to Battle by itself when a command battle starts
       and back afterwards. Tested headless on the slug fight. Turn order shows "not found yet".
+- [x] **v0.3.0 (2026-11-26): Enemy names.** Each enemy row shows the monster's name next to its
+      level. The target panel was checked on screen ("Sticky Slug"). Tested headless on two
+      boots.
 - [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.

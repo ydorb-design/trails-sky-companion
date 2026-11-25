@@ -101,8 +101,18 @@ are different classes:
   then EP/max, CP/max, stats: the same layout as the character table from level onwards.
   `st+0x74` f32 = damage taken this battle. For party units `[U+0x1d00]` is 0, so a
   "+0x1d00" chain simply fails on party slots.
-- **party unit:** `[U+0x3440]` = that character's record in the character table (level field
-  minus 4, i.e. HP-0xc).
+- **party unit:** `[U+0x3440]` is *sometimes* that character's entry in the character table
+  (HP-0xc). Not usable: on 2026-11-26 (slug fight, main 0x80c67000) Anelace's `+0x3440` pointed
+  back at her own unit for the whole fight, and enemy units held non-zero junk there, while on
+  the frog-fight boot both party links were right and enemies held 0. No other pointer from
+  Anelace's unit reaches the character table. Possible character-id fields (u32, Estelle 0 /
+  Anelace 1 on both boots): `U+0x1fc4`, `+0x2008`, `+0x3ce8`, `+0x3fb8`. With only two members
+  these can't be told apart from a party position; it needs a save where the party differs.
+- **any unit (party or enemy):** `[U+0x1b0]` = its static record: the monster table record
+  for an enemy, the character record for a party member. `[record+0x198]` -> **display name**
+  ("Sticky Slug", "Ripple Frog", "Estelle", "Anelace"); `[record+0]` -> model id ("mon5201",
+  "mon5200"). Checked on two boots (frog fight 0x80552000, slug fight 0x80c67000) and shown
+  live by the companion on the second.
 
 **In a command battle or not:** slot 0's unit `[[R+0xbb0]+0]` is non-zero only during a
 command battle (empty in the field, during a real-time field fight, and after the battle).
@@ -136,20 +146,22 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
   {descriptor, actor vector, count, capacity}. The scripted slug fight's group count went 4 ->
   3 -> 1 -> 0 as slugs died, but groups mix actor types, so the battle slot array is the
   better source.
-- Enemy names for every slot need the monster table (species key -> name). The game's parsed
-  monster table is in memory ("mon5201 ... Mini Slug / Sticky Slug / Sticky Slug+"), but no
-  pointer from a unit leads to it. Options: decode the table from the romfs, or show only the
-  target's name.
+- **Monster table** (parsed, in memory): 0x1a8-byte records. `+0` -> model id, `+0x198` ->
+  name, `+0x1a0` -> a Japanese comment. The species key in the spawn table is not stored in
+  the record, and no hash tried (crc32/crc32c/fnv/djb2/sdbm/murmur3/xxh32/oaat/md5/sha
+  prefixes over every string in the record) matches it. Not needed any more: units point at
+  their record directly (`U+0x1b0`, above).
 
 | Name | Meaning | Ref | Status |
 |---|---|---|---|
 | `enemy.count` | enemies alive | 4 at the start of the Balstar fight | found (group count) |
 | `e{e}.id` | enemy type (species key) | 0xb6f62854 | found (spawn table) |
 | `e{e}.hp` / `e{e}.hp_max` | enemy HP | 272/1676 | checked (4 boots; companion followed a write of 999) |
-| `target.name` | targeted enemy's name | Ripple Frog | chain (2 boots) |
+| `e{e}.name` | enemy name per slot | Sticky Slug | chain (2 boots, shown live) |
+| `target.name` | targeted enemy's name | Ripple Frog | chain (3 boots, shown live) |
 | `brave` | Brave Gauge points | 5 | chain (2 boots) |
 | `in_battle` | command battle running | - | chain (slot 0 unit) |
-| `turn.{i}.unit` | command battle: who acts i-th. Not found: no per-unit delay field changed in the enemy units across a turn, and the arrays holding several unit pointers (e.g. one at 0x119fcb9a40 = FrogA, Estelle, Anelace, FrogB) did not follow the on-screen order | - | - |
+| `turn.{i}.unit` | command battle: who acts i-th. Not found. Ruled out: per-unit delay fields in enemy units; every array of unit (`U`) or slot (`S`) pointers within 0x1000 bytes (all stay in slot order when the turn order changes, e.g. 0x1142c294d0, 0x114b41a9b0 on the 2026-11-26 boot); u8/u16/u32 index arrays (any stride up to 0x80) that are a permutation of 0..5 in both states (snapshots D1/D2: before and after Estelle's first turn); a 7-entry pointer list at 0x1145159c00 that did rotate is a render list (bone/shader names), not the AT bar. Next idea: follow the AT bar's own UI widgets (portrait icons) back to units | - | - |
 | `turn.{i}.bonus` | command battle: turn bonus on that slot | - | - |
 
 ### Test-harness notes (2026-11-25)

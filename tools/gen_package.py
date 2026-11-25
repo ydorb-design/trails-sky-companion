@@ -24,7 +24,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.2.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.3.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -47,6 +47,12 @@ ENEMY_ROWS = 7                         # rows that fit above the party strip
 # checked on boot 4): [[[main+0x8791a0]+0x1f08]+0x92d0]+0xfd68 -> text.
 TARGET_PTR = ["main+0x8791a0", "0x1f08", "0x92d0", "0x0"]
 TARGET_OFF = "0xfd68"
+# Every battle actor (party or enemy) points at its static record at +0x1b0: the monster table
+# record for an enemy, the character record for a party member. The record's display name
+# pointer is at +0x198. (A party actor's +0x3440 link to its character-table entry is NOT
+# usable: one boot showed it pointing back at the actor itself, so the party strip still uses
+# the character table in table order; see design/DATA.md.)
+UNIT_REC, REC_NAME = "0x1b0", 0x198
 
 # Layout (canvas 1240x1080), same as design/field.png
 CARD_W, CARD_H = 560, 350
@@ -74,6 +80,12 @@ def data_file():
                 "ptr": [BATTLE_ROOT, {"offset": "0xbb0", "stride": "0x30", "index": "$i"},
                         "0x0", "0x1d00", "0x0"]}
 
+    def unit(*hops, off, typ="u32"):
+        # slot i -> S=[R+0xbb0+i*0x30] -> unit U=[S] -> hops...
+        return {"type": typ, "count": BATTLE_SLOTS, "offset": hex(off),
+                "ptr": [BATTLE_ROOT, {"offset": "0xbb0", "stride": "0x30", "index": "$i"},
+                        "0x0", *hops]}
+
     def field(off, count=SLOTS, typ="u32"):
         return {"type": typ, "ptr": ["main+0x879628", "0x0"], "offset": hex(CHAR_HP + off),
                 "count": count, "stride": CHAR_STRIDE}
@@ -85,7 +97,8 @@ def data_file():
                     "+0x10/+0x14 CP/max. Mira u32 at O+0x20B648. Battle: R=[main+0x879470], slot i "
                     "S=[R+0xbb0+i*0x30], unit [S], enemy stats [unit+0x1d00] (+0xc HP, +0x10 "
                     "max, +4 level); [R+0xbb0]+0 (slot 0's unit) is non-zero only in a command battle. "
-                    "Brave Gauge u32 at [R+0x6540]+0x4c. See design/DATA.md."),
+                    "Brave Gauge u32 at [R+0x6540]+0x4c. Unit name: [[unit+0x1b0]+0x198] -> text. "
+                    "See design/DATA.md."),
         "points": {
             "lv": field(-0x08),
             "hp": field(0x00),
@@ -103,6 +116,8 @@ def data_file():
             "elv": enemy(0x4),
             "ehp": enemy(0xc),
             "ehpmax": enemy(0x10),
+            # per slot: display name (enemy or party member)
+            "uname": unit(UNIT_REC, "0x0", off=REC_NAME, typ="cstring"),
             "target_name": {"type": "cstring", "ptr": TARGET_PTR, "offset": TARGET_OFF},
         },
     }
@@ -145,10 +160,10 @@ def art():
     p.d.text((848, 580), "not found yet", font=font("body", 26), fill=(150, 170, 186))
     p.img.save(os.path.join(IMG, "bg_battle.png"))
 
-    # enemy row: cream panel with an empty nameplate (level drawn by the runtime)
+    # enemy row: cream panel with an empty nameplate (name and level drawn by the runtime)
     p = Page((ROW_W + 8, ROW_H + 8), transparent=True)
     p.cream_panel(2, 2, ROW_W, ROW_H)
-    p.header_bar(16, 10, 170, "", h=34, size=22)
+    p.header_bar(16, 10, 400, "", h=34, size=22)
     p.img.save(os.path.join(IMG, "enemy_row.png"))
 
     # party strip row (battle page): navy box, HP/EP/CP labels
@@ -231,9 +246,11 @@ def battle_page():
     x0, y0 = 32, ROW_Y
     w.append(dict(rep, type="image", rect=[x0 - 2, y0 - 2, ROW_W + 8, ROW_H + 8],
                   src="file:img/enemy_row.png"))
-    w.append(dict(rep, type="label", rect=[x0 + 40, y0 + 14, 0, 0], text="Lv",
+    w.append(dict(rep, type="label", rect=[x0 + 36, y0 + 14, 0, 0], bind_text="uname{i}",
+                  text_scale=3, color=rgba("num_white"), wrap_width=290, max_lines=1))
+    w.append(dict(rep, type="label", rect=[x0 + 336, y0 + 14, 0, 0], text="Lv",
                   text_scale=3, color=rgba("num_white")))
-    w.append(dict(rep, type="value", rect=[x0 + 90, y0 + 14, 0, 0], bind="elv{i}",
+    w.append(dict(rep, type="value", rect=[x0 + 376, y0 + 14, 0, 0], bind="elv{i}",
                   text_scale=3, color=rgba("num_white")))
     w.append(dict(rep, type="value", rect=[x0 + ROW_W - 24, y0 + 8, 0, 0], bind="ehp{i}",
                   max_bind="ehpmax{i}", max_sep=" / ", align="right", text_scale=4,

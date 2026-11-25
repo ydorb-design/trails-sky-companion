@@ -739,7 +739,26 @@
      "keep_min": 1,
      "type": "label",
      "rect": [
-      72,
+      68,
+      136,
+      0,
+      0
+     ],
+     "bind_text": "uname{i}",
+     "text_scale": 3,
+     "color": "#FFFFFFFF",
+     "wrap_width": 290,
+     "max_lines": 1
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "label",
+     "rect": [
+      368,
       136,
       0,
       0
@@ -756,7 +775,7 @@
      "keep_min": 1,
      "type": "value",
      "rect": [
-      122,
+      408,
       136,
       0,
       0
