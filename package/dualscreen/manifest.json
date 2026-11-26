@@ -1780,7 +1780,7 @@
      "type": "value",
      "rect": [
       768,
-      130,
+      138,
       0,
       0
      ],
@@ -1788,8 +1788,7 @@
      "max_bind": "ehpmax{i}",
      "max_sep": " / ",
      "align": "right",
-     "text_scale": 4,
-     "italic": true,
+     "text_scale": 3,
      "color": "#FF282420"
     },
     {

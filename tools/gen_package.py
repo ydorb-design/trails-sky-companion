@@ -298,9 +298,10 @@ def battle_page():
                   text_scale=3, color=rgba("num_white")))
     w.append(dict(rep, type="value", rect=[x0 + 486, y0 + 14, 0, 0], bind="elv{i}",
                   text_scale=3, color=rgba("num_white")))
-    w.append(dict(rep, type="value", rect=[x0 + ROW_W - 24, y0 + 8, 0, 0], bind="ehp{i}",
-                  max_bind="ehpmax{i}", max_sep=" / ", align="right", text_scale=4,
-                  italic=True, color=rgba("ink")))
+    # not italic: the sheared pixel font turned "/" into ":'" on the Thor
+    w.append(dict(rep, type="value", rect=[x0 + ROW_W - 24, y0 + 16, 0, 0], bind="ehp{i}",
+                  max_bind="ehpmax{i}", max_sep=" / ", align="right", text_scale=3,
+                  color=rgba("ink")))
     w.append(dict(rep, type="bar", rect=[x0 + 136, y0 + 56, ROW_W - 160, 14], bind="ehp{i}",
                   max_bind="ehpmax{i}", color=rgba("en_b"), bg=rgba("track"), frame=0))
     # party strip (character table, same rule as the party page: joined = level > 0)
