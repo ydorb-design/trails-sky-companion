@@ -1816,7 +1816,7 @@
      "rect": [
       168,
       178,
-      600,
+      394,
       14
      ],
      "bind": "ehp{i}",
@@ -1824,6 +1824,160 @@
      "color": "#FFF05A46",
      "bg": "#FF0E1A22",
      "frame": 0
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      572,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.001953125,
+      0.091796875,
+      0.048828125,
+      0.138671875
+     ],
+     "need_bind": "weak0_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      600,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.048828125,
+      0.091796875,
+      0.095703125,
+      0.138671875
+     ],
+     "need_bind": "weak1_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      628,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.095703125,
+      0.091796875,
+      0.142578125,
+      0.138671875
+     ],
+     "need_bind": "weak2_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      656,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.142578125,
+      0.091796875,
+      0.189453125,
+      0.138671875
+     ],
+     "need_bind": "weak3_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      684,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.189453125,
+      0.091796875,
+      0.236328125,
+      0.138671875
+     ],
+     "need_bind": "weak4_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      712,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.236328125,
+      0.091796875,
+      0.283203125,
+      0.138671875
+     ],
+     "need_bind": "weak5_{i}"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "image",
+     "rect": [
+      740,
+      172,
+      26,
+      26
+     ],
+     "src": "romfs:/asset/nx/image/icons.xtx",
+     "src_rect": [
+      0.283203125,
+      0.091796875,
+      0.330078125,
+      0.138671875
+     ],
+     "need_bind": "weak6_{i}"
     },
     {
      "type": "image",
@@ -3743,6 +3897,342 @@
    "cmp": "ne",
    "a": "bunit0",
    "b": 0
+  },
+  {
+   "name": "weak0_0",
+   "expr": "elem0_0 > 100"
+  },
+  {
+   "name": "weak1_0",
+   "expr": "elem1_0 > 100"
+  },
+  {
+   "name": "weak2_0",
+   "expr": "elem2_0 > 100"
+  },
+  {
+   "name": "weak3_0",
+   "expr": "elem3_0 > 100"
+  },
+  {
+   "name": "weak4_0",
+   "expr": "elem4_0 > 100"
+  },
+  {
+   "name": "weak5_0",
+   "expr": "elem5_0 > 100"
+  },
+  {
+   "name": "weak6_0",
+   "expr": "elem6_0 > 100"
+  },
+  {
+   "name": "weak0_1",
+   "expr": "elem0_1 > 100"
+  },
+  {
+   "name": "weak1_1",
+   "expr": "elem1_1 > 100"
+  },
+  {
+   "name": "weak2_1",
+   "expr": "elem2_1 > 100"
+  },
+  {
+   "name": "weak3_1",
+   "expr": "elem3_1 > 100"
+  },
+  {
+   "name": "weak4_1",
+   "expr": "elem4_1 > 100"
+  },
+  {
+   "name": "weak5_1",
+   "expr": "elem5_1 > 100"
+  },
+  {
+   "name": "weak6_1",
+   "expr": "elem6_1 > 100"
+  },
+  {
+   "name": "weak0_2",
+   "expr": "elem0_2 > 100"
+  },
+  {
+   "name": "weak1_2",
+   "expr": "elem1_2 > 100"
+  },
+  {
+   "name": "weak2_2",
+   "expr": "elem2_2 > 100"
+  },
+  {
+   "name": "weak3_2",
+   "expr": "elem3_2 > 100"
+  },
+  {
+   "name": "weak4_2",
+   "expr": "elem4_2 > 100"
+  },
+  {
+   "name": "weak5_2",
+   "expr": "elem5_2 > 100"
+  },
+  {
+   "name": "weak6_2",
+   "expr": "elem6_2 > 100"
+  },
+  {
+   "name": "weak0_3",
+   "expr": "elem0_3 > 100"
+  },
+  {
+   "name": "weak1_3",
+   "expr": "elem1_3 > 100"
+  },
+  {
+   "name": "weak2_3",
+   "expr": "elem2_3 > 100"
+  },
+  {
+   "name": "weak3_3",
+   "expr": "elem3_3 > 100"
+  },
+  {
+   "name": "weak4_3",
+   "expr": "elem4_3 > 100"
+  },
+  {
+   "name": "weak5_3",
+   "expr": "elem5_3 > 100"
+  },
+  {
+   "name": "weak6_3",
+   "expr": "elem6_3 > 100"
+  },
+  {
+   "name": "weak0_4",
+   "expr": "elem0_4 > 100"
+  },
+  {
+   "name": "weak1_4",
+   "expr": "elem1_4 > 100"
+  },
+  {
+   "name": "weak2_4",
+   "expr": "elem2_4 > 100"
+  },
+  {
+   "name": "weak3_4",
+   "expr": "elem3_4 > 100"
+  },
+  {
+   "name": "weak4_4",
+   "expr": "elem4_4 > 100"
+  },
+  {
+   "name": "weak5_4",
+   "expr": "elem5_4 > 100"
+  },
+  {
+   "name": "weak6_4",
+   "expr": "elem6_4 > 100"
+  },
+  {
+   "name": "weak0_5",
+   "expr": "elem0_5 > 100"
+  },
+  {
+   "name": "weak1_5",
+   "expr": "elem1_5 > 100"
+  },
+  {
+   "name": "weak2_5",
+   "expr": "elem2_5 > 100"
+  },
+  {
+   "name": "weak3_5",
+   "expr": "elem3_5 > 100"
+  },
+  {
+   "name": "weak4_5",
+   "expr": "elem4_5 > 100"
+  },
+  {
+   "name": "weak5_5",
+   "expr": "elem5_5 > 100"
+  },
+  {
+   "name": "weak6_5",
+   "expr": "elem6_5 > 100"
+  },
+  {
+   "name": "weak0_6",
+   "expr": "elem0_6 > 100"
+  },
+  {
+   "name": "weak1_6",
+   "expr": "elem1_6 > 100"
+  },
+  {
+   "name": "weak2_6",
+   "expr": "elem2_6 > 100"
+  },
+  {
+   "name": "weak3_6",
+   "expr": "elem3_6 > 100"
+  },
+  {
+   "name": "weak4_6",
+   "expr": "elem4_6 > 100"
+  },
+  {
+   "name": "weak5_6",
+   "expr": "elem5_6 > 100"
+  },
+  {
+   "name": "weak6_6",
+   "expr": "elem6_6 > 100"
+  },
+  {
+   "name": "weak0_7",
+   "expr": "elem0_7 > 100"
+  },
+  {
+   "name": "weak1_7",
+   "expr": "elem1_7 > 100"
+  },
+  {
+   "name": "weak2_7",
+   "expr": "elem2_7 > 100"
+  },
+  {
+   "name": "weak3_7",
+   "expr": "elem3_7 > 100"
+  },
+  {
+   "name": "weak4_7",
+   "expr": "elem4_7 > 100"
+  },
+  {
+   "name": "weak5_7",
+   "expr": "elem5_7 > 100"
+  },
+  {
+   "name": "weak6_7",
+   "expr": "elem6_7 > 100"
+  },
+  {
+   "name": "weak0_8",
+   "expr": "elem0_8 > 100"
+  },
+  {
+   "name": "weak1_8",
+   "expr": "elem1_8 > 100"
+  },
+  {
+   "name": "weak2_8",
+   "expr": "elem2_8 > 100"
+  },
+  {
+   "name": "weak3_8",
+   "expr": "elem3_8 > 100"
+  },
+  {
+   "name": "weak4_8",
+   "expr": "elem4_8 > 100"
+  },
+  {
+   "name": "weak5_8",
+   "expr": "elem5_8 > 100"
+  },
+  {
+   "name": "weak6_8",
+   "expr": "elem6_8 > 100"
+  },
+  {
+   "name": "weak0_9",
+   "expr": "elem0_9 > 100"
+  },
+  {
+   "name": "weak1_9",
+   "expr": "elem1_9 > 100"
+  },
+  {
+   "name": "weak2_9",
+   "expr": "elem2_9 > 100"
+  },
+  {
+   "name": "weak3_9",
+   "expr": "elem3_9 > 100"
+  },
+  {
+   "name": "weak4_9",
+   "expr": "elem4_9 > 100"
+  },
+  {
+   "name": "weak5_9",
+   "expr": "elem5_9 > 100"
+  },
+  {
+   "name": "weak6_9",
+   "expr": "elem6_9 > 100"
+  },
+  {
+   "name": "weak0_10",
+   "expr": "elem0_10 > 100"
+  },
+  {
+   "name": "weak1_10",
+   "expr": "elem1_10 > 100"
+  },
+  {
+   "name": "weak2_10",
+   "expr": "elem2_10 > 100"
+  },
+  {
+   "name": "weak3_10",
+   "expr": "elem3_10 > 100"
+  },
+  {
+   "name": "weak4_10",
+   "expr": "elem4_10 > 100"
+  },
+  {
+   "name": "weak5_10",
+   "expr": "elem5_10 > 100"
+  },
+  {
+   "name": "weak6_10",
+   "expr": "elem6_10 > 100"
+  },
+  {
+   "name": "weak0_11",
+   "expr": "elem0_11 > 100"
+  },
+  {
+   "name": "weak1_11",
+   "expr": "elem1_11 > 100"
+  },
+  {
+   "name": "weak2_11",
+   "expr": "elem2_11 > 100"
+  },
+  {
+   "name": "weak3_11",
+   "expr": "elem3_11 > 100"
+  },
+  {
+   "name": "weak4_11",
+   "expr": "elem4_11 > 100"
+  },
+  {
+   "name": "weak5_11",
+   "expr": "elem5_11 > 100"
+  },
+  {
+   "name": "weak6_11",
+   "expr": "elem6_11 > 100"
   }
  ],
  "page_binds": [

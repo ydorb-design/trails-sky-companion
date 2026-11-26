@@ -26,7 +26,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.5.1"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.6.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -84,6 +84,12 @@ UNIT_REC, REC_NAME, REC_ICON = "0x1b0", 0x198, 0x40
 CARD_W, CARD_H = 560, 350
 ROW_W, ROW_H, ROW_DY, ROW_Y = 760, 84, 96, 122     # battle page enemy rows
 HP_SLASH_X, HP_Y = ROW_W - 104, 16                 # enemy HP "/" (row coordinates)
+# element efficacy (%), s16 x7 at record+0x166, in the arts' element order (t_skill +0x11):
+# Earth, Water, Fire, Wind, Time, Space, Mirage. Over 100 = weak (what the game's WEAK row shows).
+REC_ELEM, ELEMENTS = 0x166, 7
+ICON_SHEET = "icons.xtx"                            # the game's icon sheet, 1024x1024
+ELEM_ICON = 26                                      # weak-element icon size on an enemy row
+ELEM_X = ROW_W - 24 - ELEMENTS * (ELEM_ICON + 2)    # first icon (row coordinates)
 PARTY_Y, PARTY_DY = 806, 68                         # battle page party strip
 BRAVE_PARTY = (480, 181)                            # gear centres (number drawn on top)
 BRAVE_BATTLE = (1150, 416)
@@ -149,6 +155,9 @@ def data_file():
             # per slot: AT-bar icon key ("m5201"), mapped to a picture by sprite_map
             "uicon": unit(UNIT_REC, "0x0", off=REC_ICON, typ="cstring"),
             "target_name": {"type": "cstring", "ptr": TARGET_PTR, "offset": TARGET_OFF},
+            # per slot and element: efficacy % (published as elem<k>_<slot>)
+            **{f"elem{k}_": unit(UNIT_REC, "0x0", off=REC_ELEM + 2 * k, typ="s16")
+               for k in range(ELEMENTS)},
         },
     }
 
@@ -307,8 +316,14 @@ def battle_page():
                   bind="ehp{i}", align="right", text_scale=3, color=rgba("ink")))
     w.append(dict(rep, type="value", rect=[x0 + HP_SLASH_X + 14, y0 + HP_Y, 0, 0],
                   bind="ehpmax{i}", text_scale=3, color=rgba("ink")))
-    w.append(dict(rep, type="bar", rect=[x0 + 136, y0 + 56, ROW_W - 160, 14], bind="ehp{i}",
+    w.append(dict(rep, type="bar", rect=[x0 + 136, y0 + 56, ELEM_X - 146, 14], bind="ehp{i}",
                   max_bind="ehpmax{i}", color=rgba("en_b"), bg=rgba("track"), frame=0))
+    # weak elements: the game's own element icons, each in its fixed place, shown when weak
+    for k in range(ELEMENTS):
+        cell = [(2 + 48 * k) / 1024, 94 / 1024, (50 + 48 * k) / 1024, 142 / 1024]
+        w.append(dict(rep, type="image",
+                      rect=[x0 + ELEM_X + k * (ELEM_ICON + 2), y0 + 50, ELEM_ICON, ELEM_ICON],
+                      src=ROMFS_IMG + ICON_SHEET, src_rect=cell, need_bind=f"weak{k}_{{i}}"))
     # party strip (character table, same rule as the party page: joined = level > 0)
     for i in range(SLOTS):
         y = PARTY_Y + i * PARTY_DY
@@ -353,7 +368,9 @@ def manifest():
                           "duration_ms": 150},
         },
         # follow the game: battle page while a command battle runs, party page otherwise
-        "derived": [{"name": "in_battle", "cmp": "ne", "a": "bunit0", "b": 0}],
+        "derived": [{"name": "in_battle", "cmp": "ne", "a": "bunit0", "b": 0}]
+                   + [{"name": f"weak{k}_{i}", "expr": f"elem{k}_{i} > 100"}
+                      for i in range(BATTLE_SLOTS) for k in range(ELEMENTS)],
         "page_binds": [{"point": "in_battle", "equals": 1,
                         "when_equal": {"page": "battle", "transition": "fade",
                                        "duration_ms": 200},

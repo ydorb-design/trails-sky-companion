@@ -5,7 +5,7 @@ A second-screen companion for **Trails in the Sky 2nd Chapter** (Switch, title
 an AYN Thor.
 
 - **Party page:** each member's portrait, name, level, HP/EP/CP, Mira and the Brave Gauge.
-- **Battle page:** every enemy's icon, name, level and HP, the targeted enemy, the Brave Gauge,
+- **Battle page:** every enemy's icon, name, level, HP and weak elements, the targeted enemy, the Brave Gauge,
   and the party's HP/EP/CP. It switches to this page by itself when a command battle starts.
 
 No game files are included. Portraits and icons are read from your own copy of the game while

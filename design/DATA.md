@@ -182,7 +182,7 @@ panel in two different fights: slugs (Sticky Slug 272/1676) and frogs (Ripple Fr
 | `target.name` | targeted enemy's name | Ripple Frog | chain (3 boots, shown live) |
 | `brave` | Brave Gauge points | 5 | chain (2 boots) |
 | `in_battle` | command battle running | - | chain (slot 0 unit) |
-| `turn.{i}.unit` | command battle: who acts i-th. Not found. Ruled out: per-unit delay fields in enemy units; every array of unit (`U`) or slot (`S`) pointers within 0x1000 bytes (all stay in slot order when the turn order changes, e.g. 0x1142c294d0, 0x114b41a9b0 on the 2026-11-26 boot); u8/u16/u32 index arrays (any stride up to 0x80) that are a permutation of 0..5 in both states (snapshots D1/D2: before and after Estelle's first turn); a 7-entry pointer list at 0x1145159c00 that did rotate is a render list (bone/shader names), not the AT bar. 2026-11-27, D1/D2 again: no qword anywhere that holds a unit (`U`) or slot (`S`) pointer changes between the two states, and no AT icon key string (`c5000`, `at_m...`) changes either, so the AT bar keeps neither; a list of 0x30-byte entries near 0x11433a9098 shifts by one entry but holds vtable objects (an engine stack, not the bar). Remaining ideas: per-unit AT/delay counters in party units (only enemy units were checked), or the bar's widgets holding texture handles | - | - |
+| `turn.{i}.unit` | command battle: who acts i-th. Not found. Ruled out: per-unit delay fields in enemy units; every array of unit (`U`) or slot (`S`) pointers within 0x1000 bytes (all stay in slot order when the turn order changes, e.g. 0x1142c294d0, 0x114b41a9b0 on the 2026-11-26 boot); u8/u16/u32 index arrays (any stride up to 0x80) that are a permutation of 0..5 in both states (snapshots D1/D2: before and after Estelle's first turn); a 7-entry pointer list at 0x1145159c00 that did rotate is a render list (bone/shader names), not the AT bar. 2026-11-27, D1/D2 again: no qword anywhere that holds a unit (`U`) or slot (`S`) pointer changes between the two states, and no AT icon key string (`c5000`, `at_m...`) changes either, so the AT bar keeps neither; a list of 0x30-byte entries near 0x11433a9098 shifts by one entry but holds vtable objects (an engine stack, not the bar). NOTE: those 2026-11-27 unit scans first used the slot pointers S, not the units U=[S]; redone with the real units (D1: 0x1146f3d610 Estelle, 0x11495bc710 Anelace, 0x114b167b90.. slugs): no shared delay counter; s16 at unit+0x25d4 is -1/0/1/2/3/4 -> -1/0/0/1/2/3 (party fixed, enemies count down: an AI/aggro rank, not the bar). Remaining idea: the bar's widgets | - | - |
 | `turn.{i}.bonus` | command battle: turn bonus on that slot | - | - |
 
 ### Test-harness notes (2026-11-25)
@@ -213,9 +213,18 @@ Agate 0005, Tita 5006, Zin 0007, Kevin 0125, Anelace 5101, ...):
 | `avfc<id>.xtx` | 256x256 | bust on transparent background (Party page portraits) |
 | `at_c<id>.xtx` | 128x64 | AT-bar face (battle party strip) |
 | `at_m<id>[_b\|_c00].xtx` | 128x64 | a monster's AT-bar icon (enemy rows); key = record+0x40 |
+| `icons.xtx` | 1024x1024 | icon sheet; element icons (Earth..Mirage) in 48x48 cells at x=48k, y=94 |
 | `fc_c<id>.xtx` | 512x256 | atlas: round HUD icon, cut-in eyes, small/medium heads |
 | `fc_chr<id>e00_a.xtx` | 512x512 | 3D face model texture (eyes), not a portrait |
 | `btlface0_c<id>.xtx` | 256x256 | battle cut-in face (only 2 exist) |
 
 Fonts: `asset/common/font/font_0.fnt` is the game font (own format; would need a module);
 `dev_font.otf` / `dev_icon.ttf` are developer fonts.
+
+## Element efficacy (2026-11-27)
+
+Every status record (`t_status`, and the live `[unit+0x1b0]`) holds 7 s16 element efficacies (%)
+at **+0x166**, in the arts' element order (`t_skill` entry +0x11: 1 Earth, 2 Water, 3 Fire,
+4 Wind, 5 Time, 6 Space, 7 Mirage). Over 100 = weak: Sticky Slug is 100/-50/300/150/100/100/100,
+and the game's WEAK row shows Fire and Wind. Checked live in battle (v0.6.0). The u8 block at
++0x15c is probably status-ailment resistance (not decoded).
