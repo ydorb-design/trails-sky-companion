@@ -239,3 +239,12 @@ it to a name; several places share one field map (`mp0000` = Rolent Region, City
 points and turns them into `map_key` = DDDD*100+NN (expr); `design/places.json` holds the names
 (tools/extract_chars.py). Checked live in Rolent and with a test write (Bracer Guild). No
 numeric current-place id was found in O (place ids there are constant lists).
+
+## Party turn (2026-11-27)
+
+`[[main+0x8794f8]+0x728]+0x78` -> a battle unit: the party member whose command turn it is, or
+who acts next while enemies act. Found by diffing D1/D2 for changed pointers to the real units
+(U0 -> U1 at 0x11445135e8); resolves on 5 boots (in the field it names a party member too).
+Checked live in the slug fight: Estelle -> Anelace -> Estelle -> Anelace; it never names an
+enemy and switches as soon as a party turn ends. Package v0.8.0 shows it (record +0x198 name,
++0x40 AT icon). The full turn order is still not found.

@@ -6,7 +6,7 @@ an AYN Thor.
 
 - **Party page:** each member's portrait, name, level, HP/EP/CP (with an S-Craft badge at
   100+ CP), Mira, the Brave Gauge and your current location.
-- **Battle page:** every enemy's icon, name, level, HP and weak elements, the targeted enemy, the Brave Gauge,
+- **Battle page:** every enemy's icon, name, level, HP and weak elements, the targeted enemy, whose party turn it is, the Brave Gauge,
   and the party's HP/EP/CP. It switches to this page by itself when a command battle starts.
 
 No game files are included. Portraits and icons are read from your own copy of the game while
@@ -21,7 +21,7 @@ it runs.
 
 ## Not done yet
 
-Turn order, and which party members are active vs. in reserve. See `PLAN.md` and
+The full turn order, and which party members are active vs. in reserve. See `PLAN.md` and
 `design/DATA.md` for the reverse-engineering notes.
 
 ## Building

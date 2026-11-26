@@ -209,6 +209,28 @@
    ],
    "offset": "0xfd68"
   },
+  "actor_name": {
+   "type": "cstring",
+   "ptr": [
+    "main+0x8794f8",
+    "0x728",
+    "0x78",
+    "0x1b0",
+    "0x0"
+   ],
+   "offset": "0x198"
+  },
+  "actor_icon": {
+   "type": "cstring",
+   "ptr": [
+    "main+0x8794f8",
+    "0x728",
+    "0x78",
+    "0x1b0",
+    "0x0"
+   ],
+   "offset": "0x40"
+  },
   "elem0_": {
    "type": "s16",
    "count": 12,

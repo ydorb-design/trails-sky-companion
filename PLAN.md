@@ -199,6 +199,9 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
       (map name at object+0x51414 -> t_place name) next to Mira and Brave; an "S-Craft" badge
       shows on the Party page and the battle party strip when a member's CP is 100+. Tested
       headless (Rolent; test writes for another map and for CP).
+- [x] **v0.8.0 (2026-11-27): Party turn.** The battle page's Turn Order panel became "Party
+      Turn": the face and name of the party member whose turn it is (or who is next while
+      enemies act). Tested live in the slug fight.
 - [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.

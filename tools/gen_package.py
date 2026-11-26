@@ -26,7 +26,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.7.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.8.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -75,6 +75,10 @@ ENEMY_ROWS = 7                         # rows that fit above the party strip
 # checked on boot 4): [[[main+0x8791a0]+0x1f08]+0x92d0]+0xfd68 -> text.
 TARGET_PTR = ["main+0x8791a0", "0x1f08", "0x92d0", "0x0"]
 TARGET_OFF = "0xfd68"
+# party member whose turn it is, or who acts next while enemies act (command battle):
+# [[main+0x8794f8]+0x728]+0x78 -> unit. Checked live: Estelle -> Anelace -> Estelle -> Anelace,
+# never an enemy (it switches as soon as a party turn ends). Resolves on 5 boots.
+ACTOR_UNIT = ["main+0x8794f8", "0x728", "0x78"]
 # Every battle actor (party or enemy) points at its static record at +0x1b0: the monster table
 # record for an enemy, the character record for a party member. The record's display name
 # pointer is at +0x198. (A party actor's +0x3440 link to its character-table entry is NOT
@@ -161,6 +165,10 @@ def data_file():
             # per slot: AT-bar icon key ("m5201"), mapped to a picture by sprite_map
             "uicon": unit(UNIT_REC, "0x0", off=REC_ICON, typ="cstring"),
             "target_name": {"type": "cstring", "ptr": TARGET_PTR, "offset": TARGET_OFF},
+            "actor_name": {"type": "cstring", "ptr": ACTOR_UNIT + [UNIT_REC, "0x0"],
+                           "offset": hex(REC_NAME)},
+            "actor_icon": {"type": "cstring", "ptr": ACTOR_UNIT + [UNIT_REC, "0x0"],
+                           "offset": hex(REC_ICON)},
             # per slot and element: efficacy % (published as elem<k>_<slot>)
             **{f"elem{k}_": unit(UNIT_REC, "0x0", off=REC_ELEM + 2 * k, typ="s16")
                for k in range(ELEMENTS)},
@@ -203,8 +211,7 @@ def art():
     p.small_caps(848, 416, "Brave", 26, fill=(255, 255, 255), outline=C["num_outline"])
     p.gear_badge(BRAVE_BATTLE[0], BRAVE_BATTLE[1], 38, "")
     p.navy_box(824, 486, 384, 290, slant=0)
-    p.small_caps(848, 526, "Turn Order", 26, fill=(255, 255, 255), outline=C["num_outline"])
-    p.d.text((848, 580), "not found yet", font=font("body", 26), fill=(150, 170, 186))
+    p.small_caps(848, 526, "Party Turn", 26, fill=(255, 255, 255), outline=C["num_outline"])
     p.img.save(os.path.join(IMG, "bg_battle.png"))
 
     # enemy row: cream panel with an empty nameplate (name and level drawn by the runtime)
@@ -310,6 +317,10 @@ def battle_page():
     w.append(brave_digit(*BRAVE_BATTLE))
     # target panel
     w.append({"type": "label", "rect": [848, 230, 0, 0], "bind_text": "target_name",
+              "text_scale": 4, "color": rgba("num_white"), "wrap_width": 340, "max_lines": 2})
+    # the party member whose turn it is / who is next (the full turn order is not found yet)
+    w.append({"type": "image", "rect": [848, 566, 160, 80], "src_bind": "actor_icon"})
+    w.append({"type": "label", "rect": [848, 664, 0, 0], "bind_text": "actor_name",
               "text_scale": 4, "color": rgba("num_white"), "wrap_width": 340, "max_lines": 2})
     # enemy rows: one template per widget, repeated over the battle slots and packed so that
     # empty slots and party slots (whose enemy chain fails) leave no gap
