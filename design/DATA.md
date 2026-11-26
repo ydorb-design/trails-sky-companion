@@ -247,4 +247,6 @@ who acts next while enemies act. Found by diffing D1/D2 for changed pointers to 
 (U0 -> U1 at 0x11445135e8); resolves on 5 boots (in the field it names a party member too).
 Checked live in the slug fight: Estelle -> Anelace -> Estelle -> Anelace; it never names an
 enemy and switches as soon as a party turn ends. Package v0.8.0 shows it (record +0x198 name,
-+0x40 AT icon). The full turn order is still not found.
++0x40 AT icon). The full turn order is still not found: a D1/D2 scan for changed pointers into
+any unit's interior (U..U+0xb000) only hits thread stacks (0x10xx..., worker frames rotating
+through units) and the three single pointers above.
