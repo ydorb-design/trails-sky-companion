@@ -37,6 +37,15 @@ def cstr(b, at):
     return b[off:b.find(b"\0", off)].decode("utf-8", "replace")
 
 
+def map_key(m):
+    """'mp0010_05' -> 1000005, 'mp6011' -> 601100 (same formula as the package's map_key expr)."""
+    if len(m) not in (6, 9) or not m.startswith("mp") or not m[2:6].isdigit():
+        return None
+    if len(m) == 9 and not (m[6] == "_" and m[7:9].isdigit()):
+        return None
+    return int(m[2:6]) * 100 + (int(m[7:9]) if len(m) == 9 else 0)
+
+
 def main():
     romfs = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser(
         "~/trails-files/romfs-base/romfs")
@@ -59,6 +68,17 @@ def main():
     for c in chars.values():
         c["face"] = f"at_{c['key']}.xtx" in images           # AT-bar face, 128x64
         c["bust"] = f"avfc{c['key'][1:]}.xtx" in images      # bust, 256x256
+    # place names by map: the game keeps the current map's name ("mp6011", "mp0010_05") in its
+    # state object; the package turns its characters into a number (map_key) and looks it up
+    places = {}
+    pl = open(os.path.join(romfs, "table_en", "t_place.tbl"), "rb").read()
+    for e in tbl_sections(pl)["PlaceTableData"]:
+        k, name = map_key(cstr(pl, e + 0x8)), cstr(pl, e + 0x60)
+        if k is not None and name and str(k) not in places:   # table order: region first
+            places[str(k)] = name
+    with open(os.path.join(ROOT, "design", "places.json"), "w") as f:
+        json.dump(places, f, indent=1, ensure_ascii=False)
+    print("places", len(places))
     out = os.path.join(ROOT, "design", "characters.json")
     with open(out, "w") as f:
         json.dump(dict(sorted(chars.items(), key=lambda kv: int(kv[0]))), f, indent=1,

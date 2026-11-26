@@ -26,7 +26,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.6.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.7.0"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
@@ -39,6 +39,8 @@ SLOTS = 4                              # first four table entries (v1: joined = 
 # Each table entry holds its character id (u32 at HP-0xc). design/characters.json (made by
 # tools/extract_chars.py from t_name/t_status) maps the id to the name the game shows and to
 # its picture key; the pictures themselves are read from the player's romfs at run time.
+PLACES = json.load(open(os.path.join(ROOT, "design", "places.json")))   # map_key -> place name
+MAP_NAME = 0x51414     # object + this: the current map's name, "mp6011" (design/DATA.md)
 CHARS = {int(k): v for k, v in
          json.load(open(os.path.join(ROOT, "design", "characters.json"))).items()}
 PIC_IDS = 200                          # ids above this are one-off guests without pictures
@@ -91,7 +93,8 @@ ICON_SHEET = "icons.xtx"                            # the game's icon sheet, 102
 ELEM_ICON = 26                                      # weak-element icon size on an enemy row
 ELEM_X = ROW_W - 24 - ELEMENTS * (ELEM_ICON + 2)    # first icon (row coordinates)
 PARTY_Y, PARTY_DY = 806, 68                         # battle page party strip
-BRAVE_PARTY = (480, 181)                            # gear centres (number drawn on top)
+BRAVE_PARTY = (640, 181)                            # gear centres (number drawn on top)
+MIRA_RIGHT, PLACE_X = 450, 725                      # party panel: mira value, location text
 BRAVE_BATTLE = (1150, 416)
 
 
@@ -142,6 +145,9 @@ def data_file():
             "cp": field(0x10),
             "cpmax": field(0x14),
             "mira": {"type": "u32", "ptr": ["main+0x879628", "0x0"], "offset": "0x20b648"},
+            # current map name, one character per point (mapc0..mapc8), turned into map_key
+            "mapc": {"type": "u8", "ptr": ["main+0x879628", "0x0"], "offset": hex(MAP_NAME),
+                     "count": 9, "stride": "0x1"},
             # command battle (design/DATA.md "Battle slot array")
             # low half of slot 0's unit pointer: non-zero only while a command battle runs
             "bunit0": {"type": "u32", "ptr": [BATTLE_ROOT, "0xbb0", "0x0"], "offset": "0x0"},
@@ -172,10 +178,11 @@ def art():
     p.metal_band(0, 96, "Party")
     p.cream_panel(32, 122, 1176, 118)
     p.small_caps(60, 182, "Mira", 30, fill=C["gold"], outline=C["brown"])
-    p.d.line((260, 140, 260, 222), fill=C["rule"], width=2)
-    p.small_caps(300, 182, "Brave", 30, fill=C["gold"], outline=C["brown"])
+    p.d.line((470, 140, 470, 222), fill=C["rule"], width=2)
+    p.small_caps(500, 182, "Brave", 30, fill=C["gold"], outline=C["brown"])
     p.gear_badge(BRAVE_PARTY[0], BRAVE_PARTY[1], 40, "")
-    p.d.line((560, 140, 560, 222), fill=C["rule"], width=2)
+    p.d.line((700, 140, 700, 222), fill=C["rule"], width=2)
+    p.small_caps(PLACE_X, 160, "Location", 22, fill=C["gold"], outline=C["brown"])
     p.img.save(os.path.join(IMG, "bg_party.png"))
 
     # card frame: navy stat box with gear badge and HP/EP/CP labels, transparent elsewhere
@@ -257,8 +264,11 @@ FACES = char_pictures("face")
 def party_page():
     w = [{"type": "image", "rect": [0, 0, 1240, 1080], "src": "file:img/bg_party.png"}]
     w += tabs("party")
-    w.append({"type": "value", "rect": [1180, 162, 0, 0], "bind": "mira", "align": "right",
+    w.append({"type": "value", "rect": [MIRA_RIGHT, 162, 0, 0], "bind": "mira", "align": "right",
               "text_scale": 5, "italic": True, "color": rgba("ink")})
+    w.append({"type": "label", "rect": [PLACE_X, 186, 0, 0], "text_bind": "map_key",
+              "text_map": PLACES, "text_scale": 3, "color": rgba("ink"),
+              "wrap_width": 1180 - PLACE_X, "max_lines": 1})
     w.append(brave_digit(*BRAVE_PARTY))
     for i in range(SLOTS):
         x, y = card_origin(i)
@@ -277,6 +287,10 @@ def party_page():
         w.append({"type": "label", "rect": [x + 82, y + 186, 0, 0], "text_bind": f"cid{i}",
                   "text_map": CHAR_NAMES,
                   "text_scale": 4, "color": rgba("num_white"), "need_bind": show})
+        # CP 100+: an S-Craft is ready
+        w.append({"type": "label", "rect": [x + 510, y + 192, 0, 0], "text": "S-Craft",
+                  "align": "right", "text_scale": 3, "color": rgba("gold"),
+                  "need_bind": f"scraft{i}"})
         for k, (key, col, ncol) in enumerate((("hp", "hp_b", "num_white"),
                                               ("ep", "ep_b", "num_yellow"),
                                               ("cp", "cp_b", "num_yellow"))):
@@ -336,6 +350,8 @@ def battle_page():
                   "text_map": CHAR_NAMES,
                   "text_scale": 3, "color": rgba("num_white"), "need_bind": show,
                   "wrap_width": 110, "max_lines": 1})
+        w.append({"type": "label", "rect": [944, y + 12, 0, 0], "text": "S-Craft",
+                  "text_scale": 2, "color": rgba("gold"), "need_bind": f"scraft{i}"})
         for key, x, wbar, col, ncol in (("hp", 340, 280, "hp_b", "num_white"),
                                         ("ep", 710, 140, "ep_b", "num_yellow"),
                                         ("cp", 940, 190, "cp_b", "num_yellow")):
@@ -368,7 +384,14 @@ def manifest():
                           "duration_ms": 150},
         },
         # follow the game: battle page while a command battle runs, party page otherwise
-        "derived": [{"name": "in_battle", "cmp": "ne", "a": "bunit0", "b": 0}]
+        "derived": [{"name": "in_battle", "cmp": "ne", "a": "bunit0", "b": 0},
+                    *({"name": f"scraft{i}", "expr": f"lv{i} > 0 && cp{i} >= 100"}
+                      for i in range(SLOTS)),
+                    # "mpDDDD" / "mpDDDD_NN" -> DDDD*100 + NN (tools/extract_chars.py map_key)
+                    {"name": "map_key", "expr": (
+                        "mapc0 == 109 && mapc1 == 112 ? "
+                        "((mapc2-48)*1000 + (mapc3-48)*100 + (mapc4-48)*10 + (mapc5-48))*100"
+                        " + (mapc6 == 95 ? (mapc7-48)*10 + (mapc8-48) : 0) : -1")}]
                    + [{"name": f"weak{k}_{i}", "expr": f"elem{k}_{i} > 100"}
                       for i in range(BATTLE_SLOTS) for k in range(ELEMENTS)],
         "page_binds": [{"point": "in_battle", "equals": 1,

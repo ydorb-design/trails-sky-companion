@@ -91,6 +91,16 @@
    ],
    "offset": "0x20b648"
   },
+  "mapc": {
+   "type": "u8",
+   "ptr": [
+    "main+0x879628",
+    "0x0"
+   ],
+   "offset": "0x51414",
+   "count": 9,
+   "stride": "0x1"
+  },
   "bunit0": {
    "type": "u32",
    "ptr": [

@@ -1,9 +1,9 @@
 #!/bin/bash
 # Generate the package source (tools/gen_package.py) and build the installable zip into dist/.
-# usage: tools/build_package.sh [version=0.6.0]
+# usage: tools/build_package.sh [version=0.7.0]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VERSION=${1:-0.6.0}
+VERSION=${1:-0.7.0}
 COMPANIONS=${COMPANIONS:-$HOME/Projects/eden/eden-duo-companions}
 python3 -I tools/gen_package.py >/dev/null
 rm -rf dist

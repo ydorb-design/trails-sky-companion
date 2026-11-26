@@ -195,6 +195,10 @@ come from its dev notes (PEANUTS.md, Nov 2026) and from what the FF Resonance co
 - [x] **v0.6.0 (2026-11-27): Enemy weaknesses.** Each enemy row shows the game's own element icons
       (icons.xtx) for the elements it is weak to (record+0x166, efficacy > 100). Tested headless in
       the slug fight: Fire and Wind, as the game shows.
+- [x] **v0.7.0 (2026-11-27): Location and S-Craft.** Party page shows the current location
+      (map name at object+0x51414 -> t_place name) next to Mira and Brave; an "S-Craft" badge
+      shows on the Party page and the battle party strip when a member's CP is 100+. Tested
+      headless (Rolent; test writes for another map and for CP).
 - [ ] Party order (who is in the active party).
 - [ ] Decode art/fonts from the game's own files (no shipped game assets), once formats are
       known. Until then: built-in pixel font, placeholder portraits.

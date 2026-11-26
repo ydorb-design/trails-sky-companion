@@ -56,7 +56,7 @@
     {
      "type": "value",
      "rect": [
-      1180,
+      450,
       162,
       0,
       0
@@ -68,9 +68,239 @@
      "color": "#FF282420"
     },
     {
+     "type": "label",
+     "rect": [
+      725,
+      186,
+      0,
+      0
+     ],
+     "text_bind": "map_key",
+     "text_map": {
+      "0": "Rolent Region",
+      "1001": "Private Residence - Apartment",
+      "1002": "Elger Arms & Guards",
+      "1003": "Melders' Orbal Factory",
+      "1004": "Rinon's General Goods",
+      "1005": "Bracer Guild - Rolent Branch",
+      "1006": "Rolent Chapel",
+      "1007": "Hotel Rolent",
+      "1008": "Rolent - Mayor's Residence",
+      "1009": "Bar - Kitchen",
+      "1010": "Bar - 2nd Floor",
+      "1011": "Private Residence - Apartment",
+      "1012": "Private Residence - Fate's Home",
+      "2000": "Rolent Sewers",
+      "4001": "Elize Highway - Cave",
+      "4101": "Bright Family House",
+      "4201": "Gurune Gate",
+      "5101": "Esmelas Tower",
+      "5200": "Malga Mine",
+      "5201": "Malga Mine",
+      "5202": "Malga Mine - Underground",
+      "5401": "Esmelas Tower - Another Dimension",
+      "5501": "Malga Trail - Water Cave",
+      "6101": "Perzel Farm - Home",
+      "6301": "Verte Bridge - Reception Area",
+      "8100": "Mistwald - Lost Woods",
+      "10000": "Opening Event Map",
+      "100000": "Bose Region",
+      "101001": "Bose Market",
+      "101002": "Frieden Hotel",
+      "101003": "Kirsche Bar",
+      "101004": "Bracer Guild - Bose Branch",
+      "101005": "Bose - Mayor's Residence",
+      "101006": "Anterose Restaurant",
+      "101007": "Bose Chapel",
+      "101008": "Zein Arms & Guards",
+      "101009": "Lucir's Orbal Factory",
+      "101010": "Private Residence - Paul's Home",
+      "101011": "Private Residence - Kuwano's Home",
+      "101012": "Private Residence - Trino's Home",
+      "101013": "Private Residence - Bordeau's Home",
+      "103101": "Verte Bridge - Reception Area",
+      "103201": "East Bose Hwy - Water Cave",
+      "104001": "West Bose Hwy - Cave",
+      "105000": "Nebel Valley",
+      "105001": "Nebel Valley - Mountain Hut",
+      "105100": "Ancient Dragon's Lair",
+      "106101": "Haken Gate",
+      "106102": "Haken Gate - Rest Area",
+      "107101": "The Kingfisher Inn",
+      "107201": "Amberl Tower",
+      "107301": "Amberl Tower - Another Dimension",
+      "108101": "Emile's General Store",
+      "108102": "The Moonlight Path",
+      "108103": "Elder's Residence",
+      "108104": "Private Residence - Grey's Home",
+      "108105": "Private Residence - Figaro's Home",
+      "108106": "Crosner Home",
+      "109101": "Krone Pass Checkpoint",
+      "110000": "Abandoned Mine",
+      "111000": "Sky Pirate Stronghold",
+      "200000": "Ruan Region",
+      "201001": "Joan Arms & Guards",
+      "201002": "Private Residence - Lytton's Home",
+      "201003": "Private Residence - Renzo's Home",
+      "201004": "Bracer Guild - Ruan Branch",
+      "201005": "Granate's Orbal Factory",
+      "201006": "Hotel Blanche",
+      "201007": "Lavantar Casino & Bar",
+      "201008": "O'Neil Duty-Free Shop",
+      "201009": "Ruan Chapel",
+      "201010": "Aqua Rossa Bar",
+      "201011": "Private Residence - Portos' Home",
+      "201012": "Private Residence - Norman's Home",
+      "201013": "Ruan - Mayor's Residence",
+      "201014": "Warehouse",
+      "204101": "Krone Trail - Water Cave",
+      "205101": "Manoria Windmill",
+      "205102": "The White Magnolia",
+      "205103": "Elder's Residence",
+      "205104": "Fiore's General Goods",
+      "205105": "Private Residence",
+      "205201": "Varenne Lighthouse",
+      "206101": "Mercia Orphanage",
+      "207101": "Main Building",
+      "207102": "Clubhouse",
+      "207103": "Auditorium",
+      "207104": "Boy's Dorm",
+      "207105": "Girl's Dorm",
+      "207110": "Old Schoolhouse",
+      "207200": "Old Schoolhouse - Underground Ruins",
+      "208001": "Aina Causeway - Cave",
+      "208101": "Sapphirl Tower",
+      "208201": "Air-Letten",
+      "208401": "Sapphirl Tower - Another Dimension",
+      "209000": "Sea Loop Map",
+      "300000": "Zeiss Region",
+      "301001": "Zeiss Central Factory",
+      "301002": "Zahnrad Hotel",
+      "301003": "Forgel Bar",
+      "301004": "Private Residence - Louise's Home",
+      "301005": "Russell Home & Factory",
+      "301006": "Bell Station",
+      "301007": "Stein Arms & Guards",
+      "301008": "Bracer Guild - Zeiss Branch",
+      "301009": "Private Residence - Stein's Home",
+      "301010": "Private Residence - Ruetle's Home",
+      "301011": "Zeiss Chapel",
+      "303000": "Kaldia Tunnel",
+      "304001": "Tratt Plains Rd - Cave",
+      "304101": "Autumn Souvenirs",
+      "304102": "Maple Leaf Inn",
+      "304104": "Pump Shed",
+      "304105": "Private Residence - Cyril's Home",
+      "304106": "Private Residence - Ed's Home",
+      "304201": "Carnelia Tower",
+      "304301": "Wolf Fort - Rest Area",
+      "304302": "Wolf Fort",
+      "304401": "Carnelia Tower - Another Dimension",
+      "305101": "Sanktheim Gate",
+      "306101": "Leiston Fortress - Command Center",
+      "306102": "Leiston Fortress - Research Facility",
+      "306103": "Leiston Fortress - Sewers",
+      "306201": "Soldat Army Road - Water Cave",
+      "307000": "Natural Hot Springs",
+      "400000": "Grancel Region",
+      "401001": "Fisherman's Guild",
+      "401002": "Bracer Guild - Grancel Branch",
+      "401003": "Wingard's Orbal Factory",
+      "401004": "Weis Arms & Guards",
+      "401005": "Sunnybell Inn",
+      "401006": "Private Residence - Ralph's Home",
+      "401007": "Private Residence - Bill's Home",
+      "401008": "Hotel Roenbaum",
+      "401009": "Private Residence - Martin's Home",
+      "401010": "Private Residence - Helmut's Home",
+      "401011": "Edel Department Store",
+      "401012": "Grand Arena",
+      "401013": "Erebonian Embassy (1st)",
+      "401014": "The History Museum",
+      "401015": "Grancel Cathedral",
+      "401016": "Baral Coffee House",
+      "401017": "The Liberl News Service",
+      "401018": "Private Residence - Seguaro's Home",
+      "401019": "Private Residence - Danke's Home",
+      "401020": "Private Residence - Filio's Home",
+      "401021": "Private Residence - General Morgan's Home",
+      "401022": "Liberl Orbalship Corporation",
+      "401023": "Dalmore Company",
+      "401024": "Wharf Warehouse",
+      "401025": "Calvard Embassy",
+      "401026": "Erebonian Embassy",
+      "402001": "Grancel Castle",
+      "402002": "Grancel Castle - Royal Keep",
+      "402003": "Grancel Castle - Elevator Loop",
+      "403000": "Grancel Sewers",
+      "404000": "Sealed Area - 1st Level",
+      "404100": "Sealed Area - 2nd Level",
+      "404200": "Sealed Area - 3rd Level",
+      "404300": "Sealed Area - 4th Level",
+      "404400": "Sealed Area - Lowest Level",
+      "404500": "Sealed Area - Boss Second Form",
+      "405101": "Kirsche Avenue - Water Cave",
+      "406001": "Erbe Scenic Route - Cave",
+      "406101": "Erbe Royal Villa - Entrance",
+      "500000": "Liber Ark",
+      "500500": "Liber Ark",
+      "511001": "Axis Pillar",
+      "511010": "Axis Pillar - Elevator Shaft",
+      "511020": "Liber Ark - Core Sector",
+      "511030": "Liber Ark - Core Sector",
+      "531001": "Cradle - Residence 1",
+      "531002": "Cradle - Residence 3",
+      "531003": "Cradle - Residence 2",
+      "531004": "Cradle - City Hall",
+      "531005": "Cradle - Tavern",
+      "531006": "Cradle - Residence 4",
+      "540100": "Park District (Calmare) Cave-in",
+      "560001": "Liber Ark Underground Tunnel\u2460",
+      "560002": "Liber Ark Underground Tunnel\u2461",
+      "560003": "Liber Ark Underground Tunnel\u2462",
+      "560004": "Liber Ark Underground Tunnel\u2463",
+      "601000": "Le Locle Training Grounds",
+      "601001": "Training Grounds Lodge",
+      "601100": "Balstar Channel",
+      "601200": "Saint-Croix Forest",
+      "601300": "Grimsel Fortress - Outdoors",
+      "601301": "Grimsel Fortress",
+      "610000": "Laboratory - Outdoors",
+      "610001": "Laboratory",
+      "620000": "Hamel",
+      "630000": "Estelle's Inner Space",
+      "640000": "On Valleria Lake",
+      "650000": "Liberl (Entire Region) Map",
+      "680000": "Holy City of Arteria",
+      "800000": "Airliner Linde Deck",
+      "800001": "Airliner Linde",
+      "801000": "Airliner Cecilia Deck",
+      "801001": "Airliner Cecilia",
+      "802000": "Factory Ship Leibnitz - Deck",
+      "802001": "Factory Ship Leibnitz",
+      "803000": "International Airliner Gretna",
+      "810000": "Bobcat Deck",
+      "810001": "Bobcat",
+      "810002": "Bobcat",
+      "820000": "Military Landing Craft",
+      "830000": "Arseille - Deck",
+      "830001": "High-Speed Cruiser Arseille - Interior",
+      "840000": "Special Ops Frigate",
+      "841000": "Society Vessel",
+      "841001": "Society Vessel - Interior",
+      "850000": "The Glorious - Deck",
+      "850001": "The Glorious - Bow, 1st Level",
+      "850002": "The Glorious - Stern, 1st Level"
+     },
+     "text_scale": 3,
+     "color": "#FF282420",
+     "wrap_width": 455,
+     "max_lines": 1
+    },
+    {
      "type": "value",
      "rect": [
-      480,
+      640,
       165,
       0,
       0
@@ -373,6 +603,20 @@
      "text_scale": 4,
      "color": "#FFFFFFFF",
      "need_bind": "lv0"
+    },
+    {
+     "type": "label",
+     "rect": [
+      550,
+      460,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "align": "right",
+     "text_scale": 3,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft0"
     },
     {
      "type": "bar",
@@ -758,6 +1002,20 @@
      "need_bind": "lv1"
     },
     {
+     "type": "label",
+     "rect": [
+      1150,
+      460,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "align": "right",
+     "text_scale": 3,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft1"
+    },
+    {
      "type": "bar",
      "rect": [
       714,
@@ -1141,6 +1399,20 @@
      "need_bind": "lv2"
     },
     {
+     "type": "label",
+     "rect": [
+      550,
+      860,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "align": "right",
+     "text_scale": 3,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft2"
+    },
+    {
      "type": "bar",
      "rect": [
       114,
@@ -1522,6 +1794,20 @@
      "text_scale": 4,
      "color": "#FFFFFFFF",
      "need_bind": "lv3"
+    },
+    {
+     "type": "label",
+     "rect": [
+      1150,
+      860,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "align": "right",
+     "text_scale": 3,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft3"
     },
     {
      "type": "bar",
@@ -2249,6 +2535,19 @@
      "max_lines": 1
     },
     {
+     "type": "label",
+     "rect": [
+      944,
+      818,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "text_scale": 2,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft0"
+    },
+    {
      "type": "bar",
      "rect": [
       340,
@@ -2606,6 +2905,19 @@
      "need_bind": "lv1",
      "wrap_width": 110,
      "max_lines": 1
+    },
+    {
+     "type": "label",
+     "rect": [
+      944,
+      886,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "text_scale": 2,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft1"
     },
     {
      "type": "bar",
@@ -2967,6 +3279,19 @@
      "max_lines": 1
     },
     {
+     "type": "label",
+     "rect": [
+      944,
+      954,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "text_scale": 2,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft2"
+    },
+    {
      "type": "bar",
      "rect": [
       340,
@@ -3324,6 +3649,19 @@
      "need_bind": "lv3",
      "wrap_width": 110,
      "max_lines": 1
+    },
+    {
+     "type": "label",
+     "rect": [
+      944,
+      1022,
+      0,
+      0
+     ],
+     "text": "S-Craft",
+     "text_scale": 2,
+     "color": "#FFD8B35A",
+     "need_bind": "scraft3"
     },
     {
      "type": "bar",
@@ -3897,6 +4235,26 @@
    "cmp": "ne",
    "a": "bunit0",
    "b": 0
+  },
+  {
+   "name": "scraft0",
+   "expr": "lv0 > 0 && cp0 >= 100"
+  },
+  {
+   "name": "scraft1",
+   "expr": "lv1 > 0 && cp1 >= 100"
+  },
+  {
+   "name": "scraft2",
+   "expr": "lv2 > 0 && cp2 >= 100"
+  },
+  {
+   "name": "scraft3",
+   "expr": "lv3 > 0 && cp3 >= 100"
+  },
+  {
+   "name": "map_key",
+   "expr": "mapc0 == 109 && mapc1 == 112 ? ((mapc2-48)*1000 + (mapc3-48)*100 + (mapc4-48)*10 + (mapc5-48))*100 + (mapc6 == 95 ? (mapc7-48)*10 + (mapc8-48) : 0) : -1"
   },
   {
    "name": "weak0_0",

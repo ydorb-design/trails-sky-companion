@@ -24,6 +24,10 @@ cp "$REAL_CFG" "$CFG"
 # Both lines matter: "<key>\default=true" makes Eden ignore the value and use the default.
 sed -i 's/^use_gdbstub\\default=true$/use_gdbstub\\default=false/; s/^use_gdbstub=false$/use_gdbstub=true/' \
     "$CFG"
+# Test runs are silent: mute the emulator's audio (the real config is untouched).
+sed -i -e 's/^volume\\default=true$/volume\\default=false/' -e 's/^volume=.*/volume=0/' \
+    -e 's/^audio_muted\\default=true$/audio_muted\\default=false/' \
+    -e 's/^audio_muted=.*/audio_muted=true/' "$CFG"
 # Storage paths in the copied config are absolute and point at the REAL profile (saves live in
 # nand). A portable ./user folder does not override them, so rewrite every one.
 for d in nand sdmc load dump tas; do

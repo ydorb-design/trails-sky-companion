@@ -228,3 +228,14 @@ at **+0x166**, in the arts' element order (`t_skill` entry +0x11: 1 Earth, 2 Wat
 4 Wind, 5 Time, 6 Space, 7 Mirage). Over 100 = weak: Sticky Slug is 100/-50/300/150/100/100/100,
 and the game's WEAK row shows Fire and Wind. Checked live in battle (v0.6.0). The u8 block at
 +0x15c is probably status-ailment resistance (not decoded).
+
+## Current location (2026-11-27)
+
+The game-state object (`O=[main+0x879628]`) holds the current map's name at **O+0x51414** as
+inline ASCII (`mp0000` in Rolent, `mp6011` in Balstar Channel, `mp0010_05` style for interiors).
+`t_place.tbl` (PlaceTableData, 0xa8 bytes: +0 place id, +0x8 map name, +0x60 display name) maps
+it to a name; several places share one field map (`mp0000` = Rolent Region, City of Rolent,
+...), so shared maps show their first (region) name. The package reads the 9 characters as u8
+points and turns them into `map_key` = DDDD*100+NN (expr); `design/places.json` holds the names
+(tools/extract_chars.py). Checked live in Rolent and with a test write (Bracer Guild). No
+numeric current-place id was found in O (place ids there are constant lists).

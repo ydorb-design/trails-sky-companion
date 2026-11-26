@@ -4,7 +4,8 @@ A second-screen companion for **Trails in the Sky 2nd Chapter** (Switch, title
 `01007A2027548000`, update 1.0.3) in Eden Duo and Peanuts Native (runtime 24 or newer), e.g. on
 an AYN Thor.
 
-- **Party page:** each member's portrait, name, level, HP/EP/CP, Mira and the Brave Gauge.
+- **Party page:** each member's portrait, name, level, HP/EP/CP (with an S-Craft badge at
+  100+ CP), Mira, the Brave Gauge and your current location.
 - **Battle page:** every enemy's icon, name, level, HP and weak elements, the targeted enemy, the Brave Gauge,
   and the party's HP/EP/CP. It switches to this page by itself when a command battle starts.
 
