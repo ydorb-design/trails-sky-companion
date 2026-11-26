@@ -1779,15 +1779,30 @@
      "keep_min": 1,
      "type": "value",
      "rect": [
-      768,
+      674,
       138,
       0,
       0
      ],
      "bind": "ehp{i}",
-     "max_bind": "ehpmax{i}",
-     "max_sep": " / ",
      "align": "right",
+     "text_scale": 3,
+     "color": "#FF282420"
+    },
+    {
+     "repeat": 12,
+     "repeat_dy": 96,
+     "pack": true,
+     "hide_bind": "ehp{i}",
+     "keep_min": 1,
+     "type": "value",
+     "rect": [
+      702,
+      138,
+      0,
+      0
+     ],
+     "bind": "ehpmax{i}",
      "text_scale": 3,
      "color": "#FF282420"
     },

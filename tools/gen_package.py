@@ -83,6 +83,7 @@ UNIT_REC, REC_NAME, REC_ICON = "0x1b0", 0x198, 0x40
 # Layout (canvas 1240x1080), same as design/field.png
 CARD_W, CARD_H = 560, 350
 ROW_W, ROW_H, ROW_DY, ROW_Y = 760, 84, 96, 122     # battle page enemy rows
+HP_SLASH_X, HP_Y = ROW_W - 104, 16                 # enemy HP "/" (row coordinates)
 PARTY_Y, PARTY_DY = 806, 68                         # battle page party strip
 BRAVE_PARTY = (480, 181)                            # gear centres (number drawn on top)
 BRAVE_BATTLE = (1150, 416)
@@ -194,6 +195,9 @@ def art():
     p = Page((ROW_W + 8, ROW_H + 8), transparent=True)
     p.cream_panel(2, 2, ROW_W, ROW_H)
     p.header_bar(136, 10, 400, "", h=34, size=22)
+    # the HP separator is drawn here: the runtime's pixel font draws "/" as a broken ":'"
+    sx = HP_SLASH_X + 2
+    p.d.line((sx + 6, HP_Y + 2, sx - 6, HP_Y + 22), fill=C["ink"], width=3)
     p.img.save(os.path.join(IMG, "enemy_row.png"))
 
     # party strip row (battle page): navy box, HP/EP/CP labels
@@ -298,10 +302,11 @@ def battle_page():
                   text_scale=3, color=rgba("num_white")))
     w.append(dict(rep, type="value", rect=[x0 + 486, y0 + 14, 0, 0], bind="elv{i}",
                   text_scale=3, color=rgba("num_white")))
-    # not italic: the sheared pixel font turned "/" into ":'" on the Thor
-    w.append(dict(rep, type="value", rect=[x0 + ROW_W - 24, y0 + 16, 0, 0], bind="ehp{i}",
-                  max_bind="ehpmax{i}", max_sep=" / ", align="right", text_scale=3,
-                  color=rgba("ink")))
+    # "hp / max": the slash is part of enemy_row.png (the pixel font's "/" is unreadable)
+    w.append(dict(rep, type="value", rect=[x0 + HP_SLASH_X - 14, y0 + HP_Y, 0, 0],
+                  bind="ehp{i}", align="right", text_scale=3, color=rgba("ink")))
+    w.append(dict(rep, type="value", rect=[x0 + HP_SLASH_X + 14, y0 + HP_Y, 0, 0],
+                  bind="ehpmax{i}", text_scale=3, color=rgba("ink")))
     w.append(dict(rep, type="bar", rect=[x0 + 136, y0 + 56, ROW_W - 160, 14], bind="ehp{i}",
                   max_bind="ehpmax{i}", color=rgba("en_b"), bg=rgba("track"), frame=0))
     # party strip (character table, same rule as the party page: joined = level > 0)
