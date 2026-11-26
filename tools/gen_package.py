@@ -26,7 +26,7 @@ from render import C, Page, font  # noqa: E402
 
 TITLE_ID = "01007A2027548000"
 BUILD16 = "5EA394E096752EE3"          # update 1.0.3 (v327680)
-VERSION = "0.5.0"   # keep in step with tools/build_package.sh's argument
+VERSION = "0.5.1"   # keep in step with tools/build_package.sh's argument
 MIN_RUNTIME = 24                      # Peanuts Native 0.1.x carries runtime 24
 PKG = os.path.join(ROOT, "package")
 DS = os.path.join(PKG, "dualscreen")
